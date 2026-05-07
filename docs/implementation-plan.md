@@ -19,7 +19,7 @@
 | i18n | next-intl (RTL/Persian + English) |
 | Maps | react-simple-maps (global heatmaps) |
 | Charts | Recharts (comparative charts) |
-| AI Chat | Vercel AI SDK (streaming chatbot UI) |
+| AI Chat | AI SDK (streaming chatbot UI) — framework-agnostic, works without Vercel |
 | Testing | Vitest + React Testing Library + Playwright (e2e) |
 | Linting | ESLint + Prettier |
 | Versioning | semantic-release + Conventional Commits (commitlint + husky) |
@@ -117,7 +117,7 @@ public/
 
 - Hero section: mission statement, CTA to explore countries.
 - Featured countries carousel/grid.
-- Quick stats (number of constitutions, clauses analyzed, votes cast).
+- Quick stats (number of constitutions, clauses analyzed, votes cast) — **fetched from Redis-cached `platformStats` query, not live aggregations**.
 - Featured topics preview cards linking to `/topics/[topic-slug]`.
 - Latest podcast episode embed.
 
@@ -190,7 +190,7 @@ Each topic page includes:
 
 ### Phase 10 — AI Chatbot Integration
 
-- Streaming chat UI using Vercel AI SDK.
+- Streaming chat UI using AI SDK.
 - `/api/chat` route that proxies to an LLM with constitutional context.
 - Country-scoped mode (when opened from a country page, context = that country's constitution).
 - General mode (answers questions across all constitutions).
@@ -495,7 +495,7 @@ export default config;
 4. **Server Components by default** — Only add `"use client"` for interactive components (votes, comments, chat, forms).
 5. **Incremental Static Regeneration (ISR)** — Country pages and constitution texts are largely static; revalidate periodically.
 6. **Optimistic UI for votes/comments** — Instant feedback via Apollo Client cache updates, reconciled with server response.
-7. **Streaming for AI chat** — Uses edge runtime + Vercel AI SDK for real-time token streaming (REST endpoint, not GraphQL).
+7. **Streaming for AI chat** — Uses AI SDK for real-time token streaming (REST endpoint, not GraphQL).
 
 ---
 
@@ -506,9 +506,9 @@ export default config;
 | Database | MongoDB Atlas (see backend plan) |
 | GraphQL Server | Apollo Server 4 + TypeGraphQL (see `implementation-plan-backend.md`) |
 | Auth provider | NextAuth.js with database adapter |
-| AI/LLM | OpenAI API / Anthropic API via Vercel AI SDK |
+| AI/LLM | OpenAI API / Anthropic API via AI SDK |
 | File storage | Local backend storage (served via REST endpoints from the backend repo) |
-| Hosting | Vercel (recommended for Next.js) |
+| Hosting | Self-hosted (Docker + Nginx), Railway, Render, Coolify, or Fly.io |
 | Analytics | Plausible / PostHog |
 | Email (password reset) | Resend / SendGrid |
 

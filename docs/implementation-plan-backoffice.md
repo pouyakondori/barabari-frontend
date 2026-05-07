@@ -568,5 +568,5 @@ VITE_APP_TITLE=Barabari Admin
 - **Performance:** Table virtualization for large datasets (>1000 rows); lazy-loaded route chunks.
 - **Security:** JWT-only auth; no public routes except login; all GraphQL operations require admin role.
 - **UX:** Breadcrumb navigation; persistent sidebar state; dark mode toggle.
-- **Deployment:** Static SPA build; deployable to Vercel / Netlify / S3+CloudFront / Nginx.
+- **Deployment:** Static SPA build; deployable to Netlify / Nginx / Coolify / Railway / Render / any static file host.
 - **Browser support:** Chrome, Firefox, Safari, Edge (latest 2 versions).

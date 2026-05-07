@@ -14,6 +14,7 @@
 | API | GraphQL via Apollo Server 4 |
 | Schema | TypeGraphQL (code-first, decorator-based) |
 | Database | MongoDB Atlas with Mongoose ODM |
+| Caching | Redis (vote counts, platform stats, comparison rankings, heatmap data) |
 | Auth | JWT (access + refresh tokens) with bcrypt password hashing |
 | Validation | class-validator (integrated with TypeGraphQL) |
 | File uploads | `multer` middleware — files stored locally under `uploads/` directory in the backend repo |
@@ -343,9 +344,9 @@ uploads/                                # Local file storage (gitignored, persis
 |---|---|---|---|
 | `topics` | Query | No | List all topics grouped by category |
 | `topic(slug: String!)` | Query | No | Topic detail with comparison data across countries |
-| `comparisonTable(topicSlug: String!, sortBy: SortBy, limit: Int, offset: Int)` | Query | No | Ranked clauses for a topic by popularity |
-| `comparisonTables` | Query | No | List all available comparison table categories |
-| `heatmapData(topicSlug: String!)` | Query | No | Array of `{ countryCode, value }` for world map |
+| `comparisonTable(topicSlug: String!, sortBy: SortBy, limit: Int, offset: Int)` | Query | No | Ranked clauses for a topic by popularity — **cached in Redis**, invalidated on vote changes |
+| `comparisonTables` | Query | No | List all available comparison table categories — **cached in Redis** |
+| `heatmapData(topicSlug: String!)` | Query | No | Array of `{ countryCode, value }` for world map — **cached in Redis**, refreshed periodically |
 | `topicFacts(topicSlug: String!, limit: Int)` | Query | No | Interesting facts for a topic |
 
 ### Podcasts
@@ -377,7 +378,7 @@ uploads/                                # Local file storage (gitignored, persis
 
 | Operation | Type | Auth | Description |
 |---|---|---|---|
-| `platformStats` | Query | No | `{ totalCountries, totalClauses, totalVotes, totalComments }` |
+| `platformStats` | Query | No | `{ totalCountries, totalClauses, totalVotes, totalComments }` — **served from Redis cache**, refreshed every 5 minutes |
 | `featuredCountries(limit: Int)` | Query | No | Curated list of featured countries |
 
 ---
@@ -410,13 +411,16 @@ uploads/                                # Local file storage (gitignored, persis
 - Build `ConstitutionResolver` with nested population (chapters → articles → clauses).
 - Implement `TimelineEvent` model and `TimelineResolver`.
 - Create database seed script with initial country and constitution data.
-- Add indexes for slug lookups and topic filtering.
+- Add compound indexes: `{ slug }` on Country, `{ countryId }` on Constitution, `{ constitutionId, order }` on Chapter, `{ chapterId, order }` on Article, `{ articleId, order }` on Clause, `{ countryId, topicSlugs }` on Clause.
+- Add text index on `Country.name.fa` and `Country.name.en` for search.
 
 ### Phase 4 — Voting System
 
 - Implement `Vote` model with unique compound index `{ clauseId, userId }`.
+- Add index `{ clauseId }` for vote count queries.
 - Build `VoteResolver` with castVote, removeVote, myVotes.
-- Implement denormalized vote count updates on `Clause` (agreeCount, disagreeCount).
+- Implement denormalized vote count updates on `Clause` (agreeCount, disagreeCount) using atomic `$inc` — **never aggregate votes on read**.
+- On vote cast/remove, invalidate relevant Redis cache keys (comparison rankings, heatmap).
 - Add rate limiting middleware for vote mutations.
 
 ### Phase 5 — Comments System
@@ -458,21 +462,28 @@ uploads/                                # Local file storage (gitignored, persis
 - Generate unique share slugs for public sharing.
 - Validate clauseIds exist on creation/update.
 
-### Phase 10 — Platform Stats & Landing Data
+### Phase 10 — Platform Stats, Landing Data & Caching Layer
 
-- Build `StatsResolver` aggregating counts from collections.
-- Implement `featuredCountries` query (admin-curated or most-voted).
-- Add caching layer (in-memory or Redis) for expensive aggregations.
+- **Set up Redis** (ioredis client) for application-level caching.
+- Build `StatsResolver` — aggregate counts from collections, **cache in Redis with 5-minute TTL**.
+- Implement `featuredCountries` query (admin-curated or most-voted) — **cached in Redis**, invalidated on admin update.
+- **Cache comparison table rankings** in Redis, keyed by `topicSlug:sortBy`. Invalidated when votes change (debounced — batch invalidation every 30 seconds, not per-vote).
+- **Cache heatmap data** in Redis, keyed by `topicSlug`. Refreshed every 15 minutes via background job or on-demand with stale-while-revalidate pattern.
+- Add `CacheService` utility wrapping Redis get/set/invalidate with TTL support.
+- All read-heavy, aggregation-heavy queries go through the cache layer — **never run expensive `$group` / `$sort` aggregations on every request**.
 
 ### Phase 11 — Security & Performance Hardening
 
 - Implement GraphQL query depth limiting (`graphql-depth-limit`).
 - Add query complexity analysis (`graphql-query-complexity`).
-- Set up rate limiting per IP and per user.
+- Set up rate limiting per IP and per user (express-rate-limit + Redis store for distributed rate limiting).
 - Input sanitization (XSS prevention) on comments.
 - CORS configuration for frontend origin.
-- Add request logging (Winston / Pino).
-- Implement MongoDB indexes audit for query performance.
+- Add request logging (Pino).
+- **MongoDB indexes audit** — ensure all query patterns have covering indexes; use `explain()` to verify no collection scans.
+- **Connection pooling** — configure Mongoose connection pool size for high concurrency.
+- **Pagination enforcement** — all list queries enforce a maximum `limit` (e.g., 100) to prevent unbounded result sets.
+- **DataLoader pattern** — use `dataloader` to batch and deduplicate MongoDB queries within a single GraphQL request (N+1 prevention for nested resolvers like clause→votes, comment→user).
 
 ### Phase 12 — Semantic Release & Versioning
 
@@ -633,13 +644,16 @@ enum UserRole { USER = "user", ADMIN = "admin" }
 ## 7. Key Technical Decisions
 
 1. **TypeGraphQL (code-first)** — Decorators on TypeScript classes generate the GraphQL schema. Single source of truth for types, validation, and resolvers.
-2. **Denormalized vote counts** — `agreeCount`/`disagreeCount` stored on `Clause` to avoid expensive aggregations on every read. Updated atomically with `$inc`.
-3. **Comment approval workflow** — New comments default to `pending` status. Only admin-approved comments are publicly visible. Editing a comment resets it to `pending`. Soft-delete preserves thread integrity; deleted comments show as "[removed]" in the UI.
-4. **Local file storage** — All uploaded assets (images, PDFs, audio) are stored in the `uploads/` directory on the backend server, organized by type (`uploads/images/`, `uploads/pdfs/`, `uploads/audio/`). Files are served via Express static middleware at `/files/`. No external cloud storage (S3, R2, GCS) is used.
-5. **JWT with refresh tokens** — Short-lived access tokens (15 min) + long-lived refresh tokens (7 days) stored in DB for revocation.
-6. **REST for streaming chat** — GraphQL handles all structured data; SSE endpoint handles real-time LLM token streaming.
-7. **Mongoose over raw MongoDB driver** — Schema validation, middleware hooks, population, and TypeScript integration.
-8. **Service layer pattern** — Resolvers delegate to services; services contain business logic and interact with models. Keeps resolvers thin and testable.
+2. **Denormalized vote counts** — `agreeCount`/`disagreeCount` stored on `Clause` to avoid expensive aggregations on every read. Updated atomically with `$inc`. At 1M+ users, this is critical — we never count votes on read.
+3. **Redis caching for expensive queries** — Platform stats, comparison rankings, heatmap data, and featured content are all cached in Redis with appropriate TTLs. Cache invalidation is debounced (batched every 30s for vote-triggered invalidations) to avoid cache stampedes under high write load.
+4. **DataLoader for N+1 prevention** — Nested GraphQL resolvers (e.g., clause→user, comment→user) use `dataloader` to batch and deduplicate database queries within a single request.
+5. **Pagination with enforced limits** — All list queries enforce a maximum result size (100 items) to prevent unbounded queries. Cursor-based pagination available for high-volume collections (votes, comments).
+6. **Comment approval workflow** — New comments default to `pending` status. Only admin-approved comments are publicly visible. Editing a comment resets it to `pending`. Soft-delete preserves thread integrity; deleted comments show as "[removed]" in the UI.
+7. **Local file storage** — All uploaded assets (images, PDFs, audio) are stored in the `uploads/` directory on the backend server, organized by type (`uploads/images/`, `uploads/pdfs/`, `uploads/audio/`). Files are served via Express static middleware at `/files/`. No external cloud storage (S3, R2, GCS) is used.
+8. **JWT with refresh tokens** — Short-lived access tokens (15 min) + long-lived refresh tokens (7 days) stored in DB for revocation.
+9. **REST for streaming chat** — GraphQL handles all structured data; SSE endpoint handles real-time LLM token streaming.
+10. **Mongoose over raw MongoDB driver** — Schema validation, middleware hooks, population, and TypeScript integration.
+11. **Service layer pattern** — Resolvers delegate to services; services contain business logic and interact with models. Keeps resolvers thin and testable.
 
 ---
 
@@ -666,6 +680,9 @@ OPENAI_API_KEY=...
 EMAIL_FROM=noreply@barabari.org
 RESEND_API_KEY=...
 
+# Redis
+REDIS_URL=redis://localhost:6379
+
 # Frontend
 CORS_ORIGIN=http://localhost:3000
 
@@ -678,8 +695,8 @@ MAX_FILE_SIZE_MB=50                  # Max upload size in MB
 
 ## 9. Non-Functional Requirements
 
-- **Performance:** Query response time < 200ms for standard queries; pagination on all list endpoints.
-- **Security:** Query depth limit (10), query complexity limit (1000), rate limiting (100 req/min per IP), input sanitization.
-- **Scalability:** Stateless server; horizontal scaling behind a load balancer; MongoDB replica set.
-- **Monitoring:** Structured logging (Pino), Apollo Server plugins for query tracing.
-- **Deployment:** Docker container; deployable to Railway / Render / AWS ECS / Fly.io.
+- **Performance:** Query response time < 200ms for standard queries; pagination on all list endpoints. Redis caching for all aggregation queries. No collection scans at 1M+ users.
+- **Security:** Query depth limit (10), query complexity limit (1000), rate limiting (100 req/min per IP, backed by Redis for distributed state), input sanitization.
+- **Scalability:** Stateless server; horizontal scaling behind a load balancer; MongoDB replica set; Redis for shared cache/rate-limit state across instances.
+- **Monitoring:** Structured logging (Pino), Apollo Server plugins for query tracing, slow-query logging for MongoDB operations > 100ms.
+- **Deployment:** Docker Compose (app + Redis); deployable to Railway / Render / Fly.io / self-hosted VPS with Docker.
