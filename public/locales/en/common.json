@@ -1,0 +1,74 @@
+{
+  "site": {
+    "name": "Barabari",
+    "tagline": "Constitutional Analysis & Comparison Platform"
+  },
+  "nav": {
+    "home": "Home",
+    "countries": "Countries",
+    "topics": "Topics",
+    "tables": "Comparison Tables",
+    "podcasts": "Podcasts",
+    "sandbox": "Sandbox",
+    "about": "About",
+    "login": "Login",
+    "signup": "Sign Up",
+    "logout": "Logout",
+    "profile": "Profile"
+  },
+  "home": {
+    "hero_title": "Know Your Constitution",
+    "hero_subtitle": "In-depth analysis and comparison of world constitutions for Iranian citizens",
+    "explore_countries": "Explore Countries",
+    "stats_countries": "Countries",
+    "stats_clauses": "Clauses",
+    "stats_votes": "Votes",
+    "stats_comments": "Comments",
+    "featured_countries": "Featured Countries",
+    "featured_topics": "Key Topics"
+  },
+  "country": {
+    "population": "Population",
+    "constitution": "Constitution",
+    "history": "History",
+    "full_text": "Full Text",
+    "amendments": "Amendments",
+    "authors": "Authors",
+    "abstract": "Abstract"
+  },
+  "clause": {
+    "agree": "Agree",
+    "disagree": "Disagree",
+    "comments": "Comments",
+    "login_to_vote": "Login to vote",
+    "login_to_comment": "Login to comment",
+    "pending_approval": "Pending approval",
+    "write_comment": "Write your comment..."
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Password",
+    "display_name": "Display Name",
+    "login": "Login",
+    "signup": "Sign Up",
+    "forgot_password": "Forgot Password",
+    "no_account": "Don't have an account?",
+    "have_account": "Already have an account?"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "no_results": "No results found",
+    "back": "Back",
+    "read_more": "Read more",
+    "search": "Search"
+  },
+  "footer": {
+    "description": "A platform for constitutional analysis and comparison worldwide",
+    "links": "Links",
+    "legal": "Legal",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "copyright": "© 2026 Barabari. All rights reserved."
+  }
+}
