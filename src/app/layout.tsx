@@ -6,7 +6,7 @@ import { Footer } from "@/components/layout/Footer";
 import "./globals.css";
 
 const vazirmatn = Vazirmatn({
-  subsets: ["arabic"],
+  subsets: ["arabic", "latin"],
   display: "swap",
   variable: "--font-vazirmatn",
 });

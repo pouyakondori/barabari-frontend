@@ -1,11 +1,5 @@
 @import "tailwindcss";
 
-@font-face {
-  font-family: "Vazirmatn";
-  src: url("https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css");
-  font-display: swap;
-}
-
 :root {
   --color-primary: #1e40af;
   --color-primary-light: #3b82f6;
@@ -34,8 +28,10 @@
   }
 }
 
-html {
-  font-family: "Vazirmatn", system-ui, -apple-system, sans-serif;
+*,
+*::before,
+*::after {
+  font-family: var(--font-vazirmatn), system-ui, -apple-system, sans-serif;
 }
 
 body {
