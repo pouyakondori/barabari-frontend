@@ -21,6 +21,7 @@
 | AI Chat | Vercel AI SDK (streaming chatbot UI) |
 | Testing | Vitest + React Testing Library + Playwright (e2e) |
 | Linting | ESLint + Prettier |
+| Versioning | semantic-release + Conventional Commits (commitlint + husky) |
 
 ---
 
@@ -196,7 +197,99 @@ Each topic page includes:
 - Optimistic UI updates via TanStack Query mutations.
 - Auth guard: unauthenticated users see a "Login to participate" prompt.
 
-### Phase 12 — Static Pages & Polish
+### Phase 12 — Semantic Release & Versioning
+
+Automate versioning and changelog generation using **semantic-release** with **Conventional Commits**.
+
+#### Packages
+
+| Package | Purpose |
+|---|---|
+| `semantic-release` | Automated version management & publishing |
+| `@commitlint/cli` | Lint commit messages against Conventional Commits |
+| `@commitlint/config-conventional` | Conventional Commits ruleset for commitlint |
+| `husky` | Git hooks manager (runs commitlint on `commit-msg`) |
+| `@semantic-release/changelog` | Auto-generate `CHANGELOG.md` |
+| `@semantic-release/git` | Commit version bumps & changelog back to repo |
+| `@semantic-release/github` | Create GitHub releases with release notes |
+
+#### Configuration
+
+- **`.releaserc.json`** — semantic-release config:
+  ```json
+  {
+    "branches": ["main"],
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      "@semantic-release/changelog",
+      "@semantic-release/npm",
+      ["@semantic-release/git", {
+        "assets": ["package.json", "CHANGELOG.md"],
+        "message": "chore(release): ${nextRelease.version} [skip ci]"
+      }],
+      "@semantic-release/github"
+    ]
+  }
+  ```
+
+- **`commitlint.config.js`**:
+  ```js
+  module.exports = { extends: ['@commitlint/config-conventional'] };
+  ```
+
+- **Husky git hooks**:
+  ```bash
+  npx husky init
+  echo "npx --no -- commitlint --edit \$1" > .husky/commit-msg
+  ```
+
+#### Commit Convention
+
+All commits must follow the [Conventional Commits](https://www.conventionalcommits.org/) format:
+
+| Prefix | Version Bump | Example |
+|---|---|---|
+| `fix:` | Patch (`0.0.X`) | `fix: resolve vote count race condition` |
+| `feat:` | Minor (`0.X.0`) | `feat: add global heatmap to comparison tables` |
+| `feat!:` or `BREAKING CHANGE:` | Major (`X.0.0`) | `feat!: redesign clause voting API` |
+| `chore:` | No release | `chore: update dev dependencies` |
+| `docs:` | No release | `docs: add API endpoint documentation` |
+| `ci:` | No release | `ci: add semantic-release workflow` |
+
+#### CI/CD Integration
+
+Add a GitHub Actions workflow (`.github/workflows/release.yml`):
+
+```yaml
+name: Release
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+```
+
+### Phase 13 — Static Pages & Polish
 
 - `/about` — About Us page with team info and mission.
 - `/privacy` — Privacy Policy (static MDX or rich text).
