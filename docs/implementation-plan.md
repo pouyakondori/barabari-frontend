@@ -1,0 +1,361 @@
+# Barabari Frontend — Implementation Plan
+
+> **Stack:** Next.js 14 (App Router) · TypeScript · React 18 · Tailwind CSS
+> **Goal:** A constitutional analysis & comparison platform for the Iranian public.
+
+---
+
+## 1. Project Bootstrap
+
+| Item | Detail |
+|---|---|
+| Framework | Next.js 14 with App Router (`/app` directory) |
+| Language | TypeScript (strict mode) |
+| Styling | Tailwind CSS + shadcn/ui component library |
+| State management | React Context + TanStack Query (server state) |
+| Auth | NextAuth.js (credentials + OAuth providers) |
+| Forms | React Hook Form + Zod validation |
+| i18n | next-intl (RTL/Persian + English) |
+| Maps | react-simple-maps (global heatmaps) |
+| Charts | Recharts (comparative charts) |
+| AI Chat | Vercel AI SDK (streaming chatbot UI) |
+| Testing | Vitest + React Testing Library + Playwright (e2e) |
+| Linting | ESLint + Prettier |
+
+---
+
+## 2. Directory Structure
+
+```
+app/
+├── (auth)/
+│   ├── login/page.tsx                          # /login
+│   ├── signup/page.tsx                         # /signup
+│   └── forgot-password/page.tsx                # /forgot-password
+├── (main)/
+│   ├── page.tsx                                # / (Landing)
+│   ├── countries/
+│   │   └── [country-slug]/
+│   │       ├── page.tsx                        # Country Profile Hub
+│   │       ├── history/page.tsx                # Country History Timeline
+│   │       └── constitution/
+│   │           ├── page.tsx                    # Full Constitution Text
+│   │           └── clause/
+│   │               └── [clause-id]/page.tsx    # Clause Detail View
+│   ├── topics/
+│   │   └── [topic-slug]/page.tsx               # Topic Comparison Hub
+│   ├── tables/
+│   │   ├── page.tsx                            # Global Comparison Tables
+│   │   └── [table-id]/page.tsx                 # Comparison Table per Topic
+│   ├── podcasts/page.tsx                       # Podcast Gallery
+│   ├── sandbox/page.tsx                        # Constitution Sandbox/Remix
+│   ├── about/page.tsx                          # About Us
+│   ├── privacy/page.tsx                        # Privacy Policy
+│   └── terms/page.tsx                          # Terms of Service
+├── api/
+│   ├── auth/[...nextauth]/route.ts             # NextAuth API route
+│   ├── chat/route.ts                           # AI chatbot streaming endpoint
+│   ├── votes/route.ts                          # Like/Dislike votes
+│   └── comments/route.ts                       # User comments
+├── layout.tsx                                  # Root layout (RTL, fonts, providers)
+└── globals.css
+components/
+├── ui/                  # shadcn/ui primitives (Button, Card, Dialog…)
+├── layout/              # Navbar, Footer, Sidebar, MobileMenu
+├── country/             # CountryCard, CountryPreface, ConstitutionViewer…
+├── comparison/          # ComparisonTable, HeatMap, TopicCard…
+├── auth/                # LoginForm, SignupForm, ForgotPasswordForm
+├── comments/            # CommentThread, CommentForm
+├── votes/               # VoteButtons (Agree/Disagree with counts)
+├── chat/                # AIChatbot, ChatMessage, ChatInput
+├── timeline/            # TimelineEvent, TimelineStepper
+└── media/               # PodcastPlayer, VideoEmbed
+lib/
+├── api.ts               # API client / fetch wrappers
+├── auth.ts              # NextAuth config
+├── types.ts             # Shared TypeScript interfaces
+├── constants.ts         # Topic categories, route constants
+└── utils.ts             # Helpers (slug, format, RTL…)
+hooks/
+├── useAuth.ts
+├── useVote.ts
+├── useComments.ts
+└── useCountry.ts
+public/
+├── locales/             # i18n JSON files (fa, en)
+├── images/
+└── icons/
+```
+
+---
+
+## 3. Implementation Phases
+
+### Phase 1 — Scaffold & Core Layout
+
+- Initialize Next.js 14 project with TypeScript and Tailwind CSS.
+- Configure ESLint, Prettier, path aliases (`@/`).
+- Set up RTL support and Persian font (Vazirmatn).
+- Build root layout with `<Navbar>`, `<Footer>`, and `<MobileMenu>`.
+- Create placeholder pages for every route from the route list.
+- Set up next-intl with Persian (default) and English.
+
+### Phase 2 — Authentication
+
+- Integrate NextAuth.js with credentials provider (email/password).
+- Build `/login`, `/signup`, `/forgot-password` pages with React Hook Form + Zod.
+- Implement auth middleware to protect comment/vote actions.
+- Add user session context (`useAuth` hook).
+
+### Phase 3 — Landing Page
+
+- Hero section: mission statement, CTA to explore countries.
+- Featured countries carousel/grid.
+- Quick stats (number of constitutions, clauses analyzed, votes cast).
+- Featured topics preview cards linking to `/topics/[topic-slug]`.
+- Latest podcast episode embed.
+
+### Phase 4 — Country Profile Hub (`/countries/[country-slug]`)
+
+- **Preface section:** Country name, flag, population, map coordinates (small interactive map).
+- **Constitution Abstract:** Summary card with key facts.
+- **Media section:** Embedded podcast player + YouTube video.
+- **Infographic:** Visual intro (image or SVG component).
+- **Links:** Navigate to sub-pages (History, Full Text).
+- **Constitutional Amendments Timeline:** Vertical stepper showing amendment years.
+- **Comparison Cards:** Link out to `/tables` with this country pre-selected.
+- **Authors section:** Grid of constitution drafters with bios.
+- **AI Chatbot:** Floating chat widget (country-scoped context).
+
+### Phase 5 — Country Sub-pages
+
+#### 5a — Country History Timeline (`/countries/[country-slug]/history`)
+- Interactive vertical timeline of political events.
+- Date of establishment, key regime changes, constitutional milestones.
+
+#### 5b — Full Constitution Text (`/countries/[country-slug]/constitution`)
+- Full Persian text rendered with article/clause structure.
+- Download as PDF button.
+- Each clause is a clickable link → `/countries/[country-slug]/constitution/clause/[clause-id]`.
+
+#### 5c — Clause Detail View (`/countries/[country-slug]/constitution/clause/[clause-id]`)
+- Display clause text with context (article, chapter).
+- **Vote buttons:** Agree / Disagree with live counts (auth-gated).
+- **Comment thread:** Threaded comments (auth-gated to post, public to read).
+- Related clauses from other countries (cross-links).
+
+### Phase 6 — Comparative Topics (`/topics/[topic-slug]`)
+
+Build one page per topic category. Categories:
+
+| Category | Topics |
+|---|---|
+| Fundamental Rights | Freedom of speech, Freedom of religion, Freedom of association, Right to life, Citizenship rights |
+| Power & Distribution | Presidential election, Parliament formation, Government formation |
+| Rights & Justice | Fair trial, Judiciary operation, Military/police operation |
+| Social & Economic | Education, Health, Housing, Labor rights |
+| Civic Duties | Voting & elections, Tax law, Citizen responsibilities |
+| Constitutional Revision | Amendment procedures |
+
+Each topic page includes:
+- Side-by-side country comparison cards.
+- Bar/radar charts comparing countries on this topic.
+- Link to the relevant global comparison table.
+
+### Phase 7 — Global Comparison Tables (`/tables`, `/tables/[table-id]`)
+
+- `/tables` — Index of all comparison categories with search/filter.
+- `/tables/[table-id]` — Per-topic table showing:
+  - **Popularity-ranked clauses** (most agreed/disagreed globally) with vote counts.
+  - **Interesting facts** callout cards.
+  - **Global Heatmap:** World map colored red→green for the topic metric using `react-simple-maps`.
+
+### Phase 8 — Podcast Gallery (`/podcasts`)
+
+- Grid/list of podcast episodes.
+- Embedded audio player.
+- Filter by country or topic.
+
+### Phase 9 — Constitution Sandbox/Remix (`/sandbox`)
+
+- Interactive tool where users can "build" a constitution by picking clauses from various countries.
+- Drag-and-drop or checkbox selection interface.
+- Export/share the remix.
+
+### Phase 10 — AI Chatbot Integration
+
+- Streaming chat UI using Vercel AI SDK.
+- `/api/chat` route that proxies to an LLM with constitutional context.
+- Country-scoped mode (when opened from a country page, context = that country's constitution).
+- General mode (answers questions across all constitutions).
+
+### Phase 11 — Voting & Comments System
+
+- `/api/votes` — POST to cast Agree/Disagree on a clause; GET to fetch counts.
+- `/api/comments` — CRUD for threaded comments on clauses.
+- Optimistic UI updates via TanStack Query mutations.
+- Auth guard: unauthenticated users see a "Login to participate" prompt.
+
+### Phase 12 — Static Pages & Polish
+
+- `/about` — About Us page with team info and mission.
+- `/privacy` — Privacy Policy (static MDX or rich text).
+- `/terms` — Terms of Service (static MDX or rich text).
+- SEO: Open Graph tags, dynamic metadata per page.
+- Performance: Image optimization, lazy loading, Suspense boundaries.
+- Accessibility: ARIA labels, keyboard navigation, RTL testing.
+- Mobile responsiveness audit.
+
+---
+
+## 4. Data Models (TypeScript Interfaces)
+
+```typescript
+interface Country {
+  id: string;
+  slug: string;
+  name: { fa: string; en: string };
+  flag: string;
+  population: number;
+  coordinates: { lat: number; lng: number };
+  abstract: string;
+  authors: Author[];
+  amendments: Amendment[];
+  podcastUrl?: string;
+  videoUrl?: string;
+}
+
+interface Constitution {
+  countryId: string;
+  chapters: Chapter[];
+  fullTextUrl: string; // PDF download link
+}
+
+interface Chapter {
+  id: string;
+  title: string;
+  articles: Article[];
+}
+
+interface Article {
+  id: string;
+  number: number;
+  clauses: Clause[];
+}
+
+interface Clause {
+  id: string;
+  number: number;
+  text: { fa: string; en: string };
+  topicSlugs: string[]; // e.g. ["freedom-of-speech", "citizenship-rights"]
+  votes: { agree: number; disagree: number };
+}
+
+interface Comment {
+  id: string;
+  clauseId: string;
+  userId: string;
+  userName: string;
+  content: string;
+  createdAt: string;
+  parentId?: string; // for threading
+}
+
+interface Topic {
+  slug: string;
+  name: { fa: string; en: string };
+  category: TopicCategory;
+  description: string;
+}
+
+type TopicCategory =
+  | "fundamental-rights"
+  | "power-distribution"
+  | "rights-justice"
+  | "social-economic"
+  | "civic-duties"
+  | "constitutional-revision";
+
+interface Author {
+  name: string;
+  bio: string;
+  imageUrl?: string;
+}
+
+interface Amendment {
+  year: number;
+  description: string;
+}
+
+interface TimelineEvent {
+  date: string;
+  title: string;
+  description: string;
+}
+
+interface HeatmapEntry {
+  countryCode: string; // ISO 3166-1 alpha-2
+  value: number;       // 0–100 scale
+}
+```
+
+---
+
+## 5. API Endpoints (Backend Contract)
+
+These are the API routes the frontend expects. They can be Next.js API routes (for MVP) or a separate backend.
+
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| GET | `/api/countries` | No | List all countries |
+| GET | `/api/countries/[slug]` | No | Country details |
+| GET | `/api/countries/[slug]/constitution` | No | Full constitution with chapters/articles/clauses |
+| GET | `/api/countries/[slug]/history` | No | Timeline events |
+| GET | `/api/clauses/[id]` | No | Single clause with votes & comments |
+| POST | `/api/votes` | Yes | Cast vote `{ clauseId, type: "agree"|"disagree" }` |
+| DELETE | `/api/votes/[id]` | Yes | Remove vote |
+| GET | `/api/comments?clauseId=X` | No | List comments for a clause |
+| POST | `/api/comments` | Yes | Create comment |
+| DELETE | `/api/comments/[id]` | Yes | Delete own comment |
+| GET | `/api/topics` | No | List all topics |
+| GET | `/api/topics/[slug]` | No | Topic detail with comparison data |
+| GET | `/api/tables` | No | List comparison tables |
+| GET | `/api/tables/[id]` | No | Table data with rankings & heatmap |
+| GET | `/api/podcasts` | No | List podcast episodes |
+| POST | `/api/chat` | No | AI chat (streaming) |
+| POST | `/api/auth/[...nextauth]` | — | Auth routes (NextAuth) |
+
+---
+
+## 6. Key Technical Decisions
+
+1. **App Router over Pages Router** — Leverages React Server Components for faster page loads and better SEO for constitution texts.
+2. **RTL-first design** — Tailwind's `dir="rtl"` with logical properties (`ps-4` instead of `pl-4`). Persian as the default locale.
+3. **Server Components by default** — Only add `"use client"` for interactive components (votes, comments, chat, forms).
+4. **Incremental Static Regeneration (ISR)** — Country pages and constitution texts are largely static; revalidate periodically.
+5. **Optimistic UI for votes/comments** — Instant feedback, reconciled with server response.
+6. **Streaming for AI chat** — Uses edge runtime + Vercel AI SDK for real-time token streaming.
+
+---
+
+## 7. Third-Party Services (To Decide)
+
+| Need | Options |
+|---|---|
+| Database | PostgreSQL (Supabase / Neon) or MongoDB Atlas |
+| Auth provider | NextAuth.js with database adapter |
+| AI/LLM | OpenAI API / Anthropic API via Vercel AI SDK |
+| File storage | Cloudflare R2 / AWS S3 (PDF constitutions) |
+| Hosting | Vercel (recommended for Next.js) |
+| Analytics | Plausible / PostHog |
+| Email (password reset) | Resend / SendGrid |
+
+---
+
+## 8. Non-Functional Requirements
+
+- **Performance:** Lighthouse score ≥ 90 on all pages.
+- **Accessibility:** WCAG 2.1 AA compliance; full RTL support.
+- **SEO:** Dynamic `<title>` and `<meta>` per page; structured data for articles.
+- **Security:** CSRF protection, rate limiting on votes/comments, input sanitization.
+- **Mobile:** Fully responsive; touch-friendly vote/comment interactions.
