@@ -16,7 +16,8 @@
 | Database | MongoDB Atlas with Mongoose ODM |
 | Auth | JWT (access + refresh tokens) with bcrypt password hashing |
 | Validation | class-validator (integrated with TypeGraphQL) |
-| File uploads | GraphQL multipart (graphql-upload) or presigned S3/R2 URLs |
+| File uploads | `multer` middleware — files stored locally under `uploads/` directory in the backend repo |
+| Static file serving | Express static middleware serving `uploads/` at `/files/` URL path |
 | AI/LLM | OpenAI / Anthropic SDK for chat completions |
 | Email | Nodemailer + Resend / SendGrid (password reset, verification) |
 | Testing | Vitest + supertest (integration) + mongodb-memory-server |
@@ -95,11 +96,18 @@ src/
 ├── utils/
 │   ├── errors.ts                   # Custom GraphQL error classes
 │   ├── pagination.ts               # Cursor/offset pagination helpers
-│   └── slugify.ts
+│   ├── slugify.ts
+│   └── fileUpload.ts               # Multer config, file path helpers
+├── routes/
+│   └── upload.ts                   # REST routes for file upload (POST /upload)
 └── seed/
     ├── countries.json              # Seed data for countries
     ├── constitutions.json          # Seed data for constitution texts
     └── seed.ts                     # Database seeding script
+uploads/                                # Local file storage (gitignored, persisted on server)
+├── images/                             # Country flags, author photos, podcast covers
+├── pdfs/                               # Constitution full-text PDFs
+└── audio/                              # Podcast audio files
 ```
 
 ---
@@ -216,10 +224,14 @@ src/
   userId: ObjectId,                // ref → User
   content: string,
   parentId?: ObjectId,             // ref → Comment (threading)
+  status: "pending" | "approved" | "rejected",  // admin approval workflow
   isDeleted: boolean,              // soft delete
   createdAt: Date,
   updatedAt: Date
 }
+// New comments default to status: "pending".
+// Only "approved" comments are visible to other users.
+// The comment author can see their own "pending" comments.
 ```
 
 ### Topic
@@ -320,9 +332,9 @@ src/
 
 | Operation | Type | Auth | Description |
 |---|---|---|---|
-| `comments(clauseId: ID!, limit: Int, offset: Int)` | Query | No | List comments for a clause (threaded) |
-| `createComment(input: CreateCommentInput!)` | Mutation | Yes | Post a comment `{ clauseId, content, parentId? }` |
-| `updateComment(id: ID!, content: String!)` | Mutation | Yes | Edit own comment |
+| `comments(clauseId: ID!, limit: Int, offset: Int)` | Query | No | List **approved** comments for a clause (threaded). If authenticated, also includes the current user's pending comments. |
+| `createComment(input: CreateCommentInput!)` | Mutation | Yes | Post a comment `{ clauseId, content, parentId? }`. New comments are created with `status: "pending"` and require admin approval before becoming publicly visible. |
+| `updateComment(id: ID!, content: String!)` | Mutation | Yes | Edit own comment (resets status to `"pending"` for re-approval) |
 | `deleteComment(id: ID!)` | Mutation | Yes | Soft-delete own comment |
 
 ### Topics & Comparisons
@@ -409,8 +421,9 @@ src/
 
 ### Phase 5 — Comments System
 
-- Implement `Comment` model with threading (parentId).
+- Implement `Comment` model with threading (parentId) and `status` field (`pending` | `approved` | `rejected`, default: `pending`).
 - Build `CommentResolver` with CRUD operations.
+- **Comment approval workflow:** New comments are created with `status: "pending"`. The public `comments` query only returns `approved` comments (plus the current user's own `pending` comments). Editing a comment resets its status to `pending` for re-approval.
 - Add ownership validation (users can only edit/delete their own comments).
 - Implement soft-delete for comment removal.
 - Add pagination (offset-based) for comment listings.
@@ -621,11 +634,12 @@ enum UserRole { USER = "user", ADMIN = "admin" }
 
 1. **TypeGraphQL (code-first)** — Decorators on TypeScript classes generate the GraphQL schema. Single source of truth for types, validation, and resolvers.
 2. **Denormalized vote counts** — `agreeCount`/`disagreeCount` stored on `Clause` to avoid expensive aggregations on every read. Updated atomically with `$inc`.
-3. **Soft-delete for comments** — Preserves thread integrity; deleted comments show as "[removed]" in the UI.
-4. **JWT with refresh tokens** — Short-lived access tokens (15 min) + long-lived refresh tokens (7 days) stored in DB for revocation.
-5. **REST for streaming chat** — GraphQL handles all structured data; SSE endpoint handles real-time LLM token streaming.
-6. **Mongoose over raw MongoDB driver** — Schema validation, middleware hooks, population, and TypeScript integration.
-7. **Service layer pattern** — Resolvers delegate to services; services contain business logic and interact with models. Keeps resolvers thin and testable.
+3. **Comment approval workflow** — New comments default to `pending` status. Only admin-approved comments are publicly visible. Editing a comment resets it to `pending`. Soft-delete preserves thread integrity; deleted comments show as "[removed]" in the UI.
+4. **Local file storage** — All uploaded assets (images, PDFs, audio) are stored in the `uploads/` directory on the backend server, organized by type (`uploads/images/`, `uploads/pdfs/`, `uploads/audio/`). Files are served via Express static middleware at `/files/`. No external cloud storage (S3, R2, GCS) is used.
+5. **JWT with refresh tokens** — Short-lived access tokens (15 min) + long-lived refresh tokens (7 days) stored in DB for revocation.
+6. **REST for streaming chat** — GraphQL handles all structured data; SSE endpoint handles real-time LLM token streaming.
+7. **Mongoose over raw MongoDB driver** — Schema validation, middleware hooks, population, and TypeScript integration.
+8. **Service layer pattern** — Resolvers delegate to services; services contain business logic and interact with models. Keeps resolvers thin and testable.
 
 ---
 
@@ -655,11 +669,9 @@ RESEND_API_KEY=...
 # Frontend
 CORS_ORIGIN=http://localhost:3000
 
-# File Storage
-S3_BUCKET=...
-S3_REGION=...
-AWS_ACCESS_KEY_ID=...
-AWS_SECRET_ACCESS_KEY=...
+# File Storage (local)
+UPLOADS_DIR=./uploads                # Local directory for uploaded files
+MAX_FILE_SIZE_MB=50                  # Max upload size in MB
 ```
 
 ---

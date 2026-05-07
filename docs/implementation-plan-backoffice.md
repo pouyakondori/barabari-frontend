@@ -18,7 +18,7 @@
 | Routing | React Router 6 |
 | Forms | Ant Design Form + Zod validation |
 | Rich Text Editor | TipTap or React Quill (for bilingual content editing) |
-| File Upload | Ant Design Upload + presigned S3/R2 URLs |
+| File Upload | Ant Design Upload → backend REST endpoint (`POST /upload`), files stored locally on backend |
 | State | Apollo Client cache + React Context (auth, UI) |
 | Charts | Recharts (dashboard analytics) |
 | Testing | Vitest + React Testing Library |
@@ -153,11 +153,11 @@ src/
 | Total Countries | `adminStats` | Number of countries in platform |
 | Total Votes | `adminStats` | Aggregate vote count |
 | Total Comments | `adminStats` | Aggregate comment count |
+| Pending Comments | `adminPendingCommentCount` | **Comments awaiting approval (highlighted)** |
 | User Growth Chart | `userGrowthData` | Line chart (daily/weekly/monthly signups) |
 | Vote Activity Chart | `voteActivityData` | Bar chart (votes per day) |
-| Recent Comments | `recentComments` | Last 10 comments (with moderation quick-actions) |
+| Recent Comments | `recentComments` | Last 10 comments (with approve/reject quick-actions) |
 | Recent Signups | `recentUsers` | Last 10 registered users |
-| Flagged Content | `flaggedComments` | Comments reported by users |
 
 ### 3.3 User Management (`/users`)
 
@@ -235,17 +235,24 @@ This is the core content management area. Constitutions are structured hierarchi
 
 | Feature | Detail |
 |---|---|
-| List | All comments with filters: clause, user, date range, status (active/deleted/flagged) |
+| Approval Queue | **Primary view:** All `pending` comments awaiting admin approval, sorted newest first |
+| List | All comments with filters: clause, user, date range, status (`pending`/`approved`/`rejected`/`deleted`) |
 | View | Comment content with thread context and clause reference |
-| Actions | Delete (soft), restore, flag/unflag |
-| Bulk moderation | Select multiple → bulk delete/restore |
-| Flagged queue | Priority view showing user-reported comments |
+| Actions | **Approve**, **reject**, delete (soft), restore |
+| Bulk moderation | Select multiple → bulk approve, bulk reject, bulk delete |
+| Quick approve | One-click approve button directly in the table row |
+| Notification badge | Sidebar badge showing count of pending comments |
 
 **GraphQL Operations:**
 - `adminComments(clauseId, userId, status, search, limit, offset)` — Query
+- `adminApproveComment(id)` — Mutation
+- `adminRejectComment(id)` — Mutation
+- `adminBulkApproveComments(ids)` — Mutation
+- `adminBulkRejectComments(ids)` — Mutation
 - `adminDeleteComment(id)` — Mutation
 - `adminRestoreComment(id)` — Mutation
 - `adminBulkDeleteComments(ids)` — Mutation
+- `adminPendingCommentCount` — Query (for sidebar badge)
 
 ### 3.8 Vote Analytics (`/votes`)
 
@@ -355,7 +362,8 @@ The following queries and mutations must be added to the backend to support the 
 | `adminCountries(search, limit, offset)` | Admin country list |
 | `adminConstitutions(countrySlug)` | Constitutions with full nested structure |
 | `adminTopics` | All topics with clause counts |
-| `adminComments(clauseId, userId, status, search, limit, offset)` | Comments with moderation filters |
+| `adminComments(clauseId, userId, status, search, limit, offset)` | Comments with moderation filters (status: pending/approved/rejected/deleted) |
+| `adminPendingCommentCount` | Count of comments awaiting approval (for sidebar badge) |
 | `adminVoteStats(groupBy, dateRange)` | Vote analytics data |
 | `adminClauseVoteRankings(sortBy, limit, offset)` | Clause rankings by vote metrics |
 | `adminPodcasts(search, countryId, topicSlug, limit, offset)` | Podcast list |
@@ -384,7 +392,9 @@ The following queries and mutations must be added to the backend to support the 
 | `adminBulkImportConstitution(countryId, data)` | Bulk import chapters/articles/clauses |
 | `adminReorderItems(type, ids)` | Reorder chapters, articles, or clauses |
 | `adminCreateTopic` / `adminUpdateTopic` / `adminDeleteTopic` | Topic CRUD |
-| `adminDeleteComment(id)` / `adminRestoreComment(id)` | Comment moderation |
+| `adminApproveComment(id)` / `adminRejectComment(id)` | Approve or reject a pending comment |
+| `adminBulkApproveComments(ids)` / `adminBulkRejectComments(ids)` | Bulk approve/reject |
+| `adminDeleteComment(id)` / `adminRestoreComment(id)` | Comment soft-delete/restore |
 | `adminBulkDeleteComments(ids)` | Bulk comment deletion |
 | `adminCreatePodcast` / `adminUpdatePodcast` / `adminDeletePodcast` | Podcast CRUD |
 | `adminCreateTimelineEvent` / `adminUpdateTimelineEvent` / `adminDeleteTimelineEvent` | Timeline CRUD |
@@ -416,8 +426,8 @@ The following queries and mutations must be added to the backend to support the 
 
 - Build `Dashboard` page with stat cards.
 - Implement user growth and vote activity charts (Recharts).
+- Add **pending comments count** widget (highlighted, links to approval queue).
 - Add recent comments and recent signups widgets.
-- Add flagged content summary card.
 
 ### Phase 3 — User Management
 
@@ -458,11 +468,12 @@ The following queries and mutations must be added to the backend to support the 
 
 ### Phase 7 — Comment Moderation
 
-- Build `CommentModeration` page with filterable table.
-- Show comment content, clause context, author info.
-- Quick-action buttons: delete, restore, flag/unflag.
-- Bulk moderation toolbar.
-- Flagged comments priority queue view.
+- Build `CommentModeration` page with **approval queue as the default view** (pending comments first).
+- Show comment content, clause context, author info, submission date.
+- **Quick-action buttons: approve, reject, delete, restore.**
+- Bulk moderation toolbar (bulk approve, bulk reject, bulk delete).
+- Tab/filter to switch between pending, approved, rejected, deleted views.
+- **Sidebar badge** showing pending comment count (auto-refreshed via polling or Apollo subscription).
 
 ### Phase 8 — Vote Analytics
 
@@ -516,8 +527,8 @@ CI/CD workflow (`.github/workflows/release.yml`) identical to frontend/backend r
 |---|---|
 | `BilingualInput` | Side-by-side or tabbed `fa`/`en` text inputs; works with both plain text and rich text |
 | `SlugInput` | Text input that auto-generates a URL-safe slug from another field |
-| `ImageUpload` | Drag-and-drop image upload with preview, crops, and S3/R2 integration |
-| `FileUpload` | Generic file upload (PDF constitutions, audio files) |
+| `ImageUpload` | Drag-and-drop image upload with preview; uploads to backend `POST /upload` endpoint (local storage) |
+| `FileUpload` | Generic file upload (PDF constitutions, audio files); uploads to backend `POST /upload` endpoint (local storage) |
 | `DataTable` | Wrapper around Ant Design `Table` with built-in search, pagination, column sorting, and bulk select |
 | `ConfirmModal` | Reusable delete/action confirmation dialog |
 | `StatusBadge` | Color-coded badge for entity statuses (active, banned, deleted, flagged) |
@@ -535,7 +546,9 @@ CI/CD workflow (`.github/workflows/release.yml`) identical to frontend/backend r
 3. **Shared GraphQL schema** — Backoffice connects to the same backend as the frontend; admin-specific resolvers are gated by `@Authorized("admin")`.
 4. **Admin role enforcement** — Both client-side (route guards) and server-side (`authChecker`) enforce admin access.
 5. **Bilingual-first components** — Every content form uses `BilingualInput` to ensure fa/en content is always entered together.
-6. **Audit logging** — Every admin mutation triggers an audit log entry on the backend for accountability.
+6. **Comment approval workflow** — The comment moderation page defaults to the pending approval queue. Admins must explicitly approve each comment before it becomes publicly visible on the frontend. Bulk approve/reject is supported for efficiency.
+7. **Local file storage** — File uploads (images, PDFs, audio) are sent to the backend `POST /upload` REST endpoint and stored locally in the backend's `uploads/` directory. No cloud storage services are used.
+8. **Audit logging** — Every admin mutation triggers an audit log entry on the backend for accountability.
 7. **Apollo cache updates** — Mutations update the Apollo cache optimistically to keep the UI responsive without refetching.
 
 ---

@@ -147,7 +147,7 @@ public/
 #### 5c — Clause Detail View (`/countries/[country-slug]/constitution/clause/[clause-id]`)
 - Display clause text with context (article, chapter).
 - **Vote buttons:** Agree / Disagree with live counts (auth-gated).
-- **Comment thread:** Threaded comments (auth-gated to post, public to read).
+- **Comment thread:** Threaded comments (auth-gated to post, public to read). Only admin-approved comments are visible; newly submitted comments show a "pending review" notice to the author.
 - Related clauses from other countries (cross-links).
 
 ### Phase 6 — Comparative Topics (`/topics/[topic-slug]`)
@@ -199,6 +199,7 @@ Each topic page includes:
 
 - `/api/votes` — POST to cast Agree/Disagree on a clause; GET to fetch counts.
 - `/api/comments` — CRUD for threaded comments on clauses.
+- **Comment approval workflow:** Newly submitted comments are in `pending` status and not publicly visible. Only admin-approved comments (`status: "approved"`) are shown to other users. The comment author sees their own pending comments with a "Awaiting approval" badge.
 - Optimistic UI updates via TanStack Query mutations.
 - Auth guard: unauthenticated users see a "Login to participate" prompt.
 
@@ -355,6 +356,7 @@ interface Comment {
   userId: string;
   userName: string;
   content: string;
+  status: "pending" | "approved" | "rejected";
   createdAt: string;
   parentId?: string; // for threading
 }
@@ -505,7 +507,7 @@ export default config;
 | GraphQL Server | Apollo Server 4 + TypeGraphQL (see `implementation-plan-backend.md`) |
 | Auth provider | NextAuth.js with database adapter |
 | AI/LLM | OpenAI API / Anthropic API via Vercel AI SDK |
-| File storage | Cloudflare R2 / AWS S3 (PDF constitutions) |
+| File storage | Local backend storage (served via REST endpoints from the backend repo) |
 | Hosting | Vercel (recommended for Next.js) |
 | Analytics | Plausible / PostHog |
 | Email (password reset) | Resend / SendGrid |
