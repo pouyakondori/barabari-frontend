@@ -5,10 +5,12 @@ import { GET_TOPICS } from "@/graphql/queries/topics";
 import { Card, CardContent } from "@/components/ui/card";
 import { localized } from "@/lib/utils";
 import { TOPIC_CATEGORIES } from "@/lib/constants";
+import { useTranslation } from "@/locale";
 import Link from "next/link";
 import type { Topic } from "@/lib/types";
 
 export default function TopicsPage() {
+  const { t, locale } = useTranslation();
   const { data, loading } = useQuery<{ topics: Topic[] }>(GET_TOPICS);
   const topics = data?.topics || [];
 
@@ -19,13 +21,13 @@ export default function TopicsPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <h1 className="text-3xl font-bold text-[var(--color-foreground)] mb-2">موضوعات</h1>
+      <h1 className="text-3xl font-bold text-[var(--color-foreground)] mb-2">{t("topics.title")}</h1>
       <p className="text-[var(--color-muted-foreground)] mb-8">
-        موضوعات مختلف حقوقی و مدنی در قوانین اساسی جهان
+        {t("topics.description")}
       </p>
 
       {loading ? (
-        <p className="text-[var(--color-muted-foreground)]">در حال بارگذاری...</p>
+        <p className="text-[var(--color-muted-foreground)]">{t("common.loading")}</p>
       ) : (
         <div className="space-y-10">
           {grouped
@@ -33,7 +35,7 @@ export default function TopicsPage() {
             .map((group) => (
               <div key={group.slug}>
                 <h2 className="text-xl font-semibold text-[var(--color-foreground)] mb-4">
-                  {localized(group.name)}
+                  {t(`categories.${group.slug}`)}
                 </h2>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {group.topics.map((topic: Topic) => (
@@ -41,10 +43,10 @@ export default function TopicsPage() {
                       <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
                         <CardContent className="p-6">
                           <h3 className="font-semibold text-[var(--color-foreground)]">
-                            {localized(topic.name)}
+                            {localized(topic.name, locale)}
                           </h3>
                           <p className="mt-1 text-sm text-[var(--color-muted-foreground)] line-clamp-2">
-                            {localized(topic.description)}
+                            {localized(topic.description, locale)}
                           </p>
                         </CardContent>
                       </Card>

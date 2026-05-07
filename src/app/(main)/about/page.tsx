@@ -1,43 +1,43 @@
+"use client";
+
 import { Card, CardContent } from "@/components/ui/card";
+import { useTranslation } from "@/locale";
 
 export default function AboutPage() {
+  const { t, tArray } = useTranslation();
+
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-      <h1 className="text-3xl font-bold text-[var(--color-foreground)] mb-6">درباره برابری</h1>
+      <h1 className="text-3xl font-bold text-[var(--color-foreground)] mb-6">{t("about.title")}</h1>
 
       <Card>
         <CardContent className="p-8 space-y-6">
           <section>
             <h2 className="text-xl font-semibold text-[var(--color-foreground)] mb-3">
-              مأموریت ما
+              {t("about.mission_title")}
             </h2>
             <p className="text-[var(--color-foreground)] leading-relaxed">
-              در دوران تحول، درک ستون فقرات یک ملت — قانون اساسی آن — دیگر یک کار علمی نیست،
-              بلکه یک ضرورت مدنی است. ما با راه‌اندازی یک پلتفرم تحلیلی جامع که به مردم ایران
-              اختصاص دارد، شکاف بین پیچیدگی حقوقی و آگاهی عمومی را پر می‌کنیم.
+              {t("about.mission_text")}
             </p>
           </section>
 
           <section>
             <h2 className="text-xl font-semibold text-[var(--color-foreground)] mb-3">
-              هدف ما
+              {t("about.goal_title")}
             </h2>
             <p className="text-[var(--color-foreground)] leading-relaxed">
-              روشن ساختن تأثیر عمیق قانون اساسی بر زندگی روزمره شهروندان. با موشکافی ساختار
-              حقوقی فعلی ایران و قرار دادن آن در کنار چارچوب‌های حکومتی متنوع جامعه بین‌المللی،
-              آینه‌ای برای تأمل و پنجره‌ای برای الهام فراهم می‌کنیم.
+              {t("about.goal_text")}
             </p>
           </section>
 
           <section>
             <h2 className="text-xl font-semibold text-[var(--color-foreground)] mb-3">
-              معماری آگاهی
+              {t("about.architecture_title")}
             </h2>
             <ul className="list-disc list-inside space-y-2 text-[var(--color-foreground)]">
-              <li>تحلیل عمیق: حذف زبان حقوقی پیچیده و آشکار ساختن مکانیسم‌های اصلی</li>
-              <li>دیدگاه جهانی: بررسی نحوه برخورد کشورها با آزادی‌های بنیادین</li>
-              <li>مقایسه داده‌محور: نقشه‌های حرارتی و رتبه‌بندی محبوبیت</li>
-              <li>چشم‌انداز مشارکتی: آزمایشگاه فکری برای مشارکت شهروندان</li>
+              {tArray("about.architecture_items").map((item, i) => (
+                <li key={i}>{item}</li>
+              ))}
             </ul>
           </section>
         </CardContent>

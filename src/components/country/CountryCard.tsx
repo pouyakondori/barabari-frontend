@@ -1,14 +1,18 @@
+"use client";
+
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatNumber, localized } from "@/lib/utils";
+import { useTranslation } from "@/locale";
 import type { Country } from "@/lib/types";
 
 interface CountryCardProps {
   country: Country;
-  locale?: string;
 }
 
-export function CountryCard({ country, locale = "fa" }: CountryCardProps) {
+export function CountryCard({ country }: CountryCardProps) {
+  const { t, locale } = useTranslation();
+
   return (
     <Link href={`/countries/${country.slug}`}>
       <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
@@ -20,7 +24,7 @@ export function CountryCard({ country, locale = "fa" }: CountryCardProps) {
                 {localized(country.name, locale)}
               </h3>
               <p className="text-sm text-[var(--color-muted-foreground)] mt-1">
-                جمعیت: {formatNumber(country.population, locale)}
+                {t("countries.population")}: {formatNumber(country.population, locale)}
               </p>
               {country.abstract && (
                 <p className="text-sm text-[var(--color-muted-foreground)] mt-2 line-clamp-2">

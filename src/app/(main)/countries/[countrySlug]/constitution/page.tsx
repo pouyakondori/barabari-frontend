@@ -6,6 +6,7 @@ import { GET_COUNTRY } from "@/graphql/queries/countries";
 import { GET_CONSTITUTION } from "@/graphql/queries/constitution";
 import { Card, CardContent } from "@/components/ui/card";
 import { localized } from "@/lib/utils";
+import { useTranslation } from "@/locale";
 import Link from "next/link";
 import { ArrowRight, BookOpen } from "lucide-react";
 import type { Country, Constitution, Chapter, Article, Clause } from "@/lib/types";
@@ -13,6 +14,7 @@ import type { Country, Constitution, Chapter, Article, Clause } from "@/lib/type
 export default function ConstitutionPage() {
   const params = useParams();
   const countrySlug = params.countrySlug as string;
+  const { t, locale } = useTranslation();
 
   const { data: countryData } = useQuery<{ country: Country }>(GET_COUNTRY, { variables: { slug: countrySlug } });
   const { data: constitutionData, loading } = useQuery<{ constitution: Constitution }>(GET_CONSTITUTION, {
@@ -25,7 +27,7 @@ export default function ConstitutionPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <p className="text-[var(--color-muted-foreground)]">در حال بارگذاری...</p>
+        <p className="text-[var(--color-muted-foreground)]">{t("common.loading")}</p>
       </div>
     );
   }
@@ -37,21 +39,21 @@ export default function ConstitutionPage() {
         className="inline-flex items-center gap-1 text-sm text-[var(--color-primary)] hover:underline mb-6"
       >
         <ArrowRight className="h-4 w-4" />
-        بازگشت به {country ? localized(country.name) : "کشور"}
+        {`${t("countries.back_to")} ${country ? localized(country.name, locale) : t("countries.fallback_country")}`}
       </Link>
 
       <div className="flex items-center gap-3 mb-8">
         <BookOpen className="h-8 w-8 text-[var(--color-primary)]" />
         <div>
           <h1 className="text-3xl font-bold text-[var(--color-foreground)]">
-            قانون اساسی {country ? localized(country.name) : ""}
+            {`${t("constitution.title")} ${country ? localized(country.name, locale) : ""}`}
           </h1>
-          <p className="text-[var(--color-muted-foreground)]">متن کامل</p>
+          <p className="text-[var(--color-muted-foreground)]">{t("countries.full_text_short")}</p>
         </div>
       </div>
 
       {!constitution ? (
-        <p className="text-[var(--color-muted-foreground)]">قانون اساسی یافت نشد.</p>
+        <p className="text-[var(--color-muted-foreground)]">{t("constitution.not_found")}</p>
       ) : (
         <div className="space-y-8">
           {constitution.chapters
@@ -61,7 +63,7 @@ export default function ConstitutionPage() {
               <Card key={chapter.id}>
                 <CardContent className="p-6">
                   <h2 className="text-xl font-bold text-[var(--color-foreground)] mb-4 pb-2 border-b border-[var(--color-border)]">
-                    فصل {chapter.number}: {localized(chapter.title)}
+                    {t("countries.chapter")} {chapter.number}: {localized(chapter.title, locale)}
                   </h2>
 
                   <div className="space-y-6">
@@ -72,7 +74,7 @@ export default function ConstitutionPage() {
                         <div key={article.id}>
                           {article.title && (
                             <h3 className="font-semibold text-[var(--color-foreground)] mb-3">
-                              اصل {article.number}: {localized(article.title)}
+                              {t("countries.article")} {article.number}: {localized(article.title, locale)}
                             </h3>
                           )}
 
@@ -88,10 +90,10 @@ export default function ConstitutionPage() {
                                 >
                                   <div className="flex items-start gap-2">
                                     <span className="text-sm font-medium text-[var(--color-primary)] shrink-0">
-                                      بند {clause.number}:
+                                      {t("countries.clause")} {clause.number}:
                                     </span>
                                     <p className="text-sm text-[var(--color-foreground)] leading-relaxed group-hover:text-[var(--color-primary)]">
-                                      {localized(clause.text)}
+                                      {localized(clause.text, locale)}
                                     </p>
                                   </div>
                                   <div className="flex items-center gap-3 mt-1 text-xs text-[var(--color-muted-foreground)]">

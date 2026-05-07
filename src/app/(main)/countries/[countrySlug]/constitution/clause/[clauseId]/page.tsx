@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { VoteButtons } from "@/components/votes/VoteButtons";
 import { CommentThread } from "@/components/comments/CommentThread";
 import { localized } from "@/lib/utils";
+import { useTranslation } from "@/locale";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import type { Clause, Country } from "@/lib/types";
@@ -17,6 +18,7 @@ export default function ClauseDetailPage() {
   const params = useParams();
   const clauseId = params.clauseId as string;
   const countrySlug = params.countrySlug as string;
+  const { t, locale } = useTranslation();
 
   const { data: clauseData, loading: clauseLoading } = useQuery<{ clause: Clause }>(GET_CLAUSE, {
     variables: { id: clauseId },
@@ -31,7 +33,7 @@ export default function ClauseDetailPage() {
   if (clauseLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <p className="text-[var(--color-muted-foreground)]">در حال بارگذاری...</p>
+        <p className="text-[var(--color-muted-foreground)]">{t("common.loading")}</p>
       </div>
     );
   }
@@ -39,7 +41,7 @@ export default function ClauseDetailPage() {
   if (!clause) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <p className="text-[var(--color-muted-foreground)]">بند مورد نظر یافت نشد</p>
+        <p className="text-[var(--color-muted-foreground)]">{t("clause.not_found")}</p>
       </div>
     );
   }
@@ -51,14 +53,14 @@ export default function ClauseDetailPage() {
         className="inline-flex items-center gap-1 text-sm text-[var(--color-primary)] hover:underline mb-6"
       >
         <ArrowRight className="h-4 w-4" />
-        بازگشت به قانون اساسی {country ? localized(country.name) : ""}
+        {`${t("constitution.back_to_constitution")} ${country ? localized(country.name, locale) : ""}`}
       </Link>
 
       {/* Clause content */}
       <Card className="mb-8">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>بند {clause.number}</CardTitle>
+            <CardTitle>{t("clause.title")} {clause.number}</CardTitle>
             <div className="flex gap-1">
               {clause.topicSlugs.map((slug: string) => (
                 <Link key={slug} href={`/topics/${slug}`}>

@@ -6,23 +6,21 @@ import { Menu, X, Globe } from "lucide-react";
 import { ROUTES } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
-
-const navLinks = [
-  { href: ROUTES.HOME, label: { fa: "خانه", en: "Home" } },
-  { href: ROUTES.COUNTRIES, label: { fa: "کشورها", en: "Countries" } },
-  { href: ROUTES.TOPICS, label: { fa: "موضوعات", en: "Topics" } },
-  { href: ROUTES.TABLES, label: { fa: "جداول مقایسه‌ای", en: "Tables" } },
-  { href: ROUTES.PODCASTS, label: { fa: "پادکست‌ها", en: "Podcasts" } },
-  { href: ROUTES.SANDBOX, label: { fa: "آزمایشگاه", en: "Sandbox" } },
-];
+import { useTranslation } from "@/locale";
 
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [locale, setLocale] = useState<"fa" | "en">("fa");
+  const { t, locale, toggleLocale } = useTranslation();
   const { user, logout } = useAuth();
 
-  const t = (link: { fa: string; en: string }) =>
-    locale === "en" ? link.en : link.fa;
+  const navLinks = [
+    { href: ROUTES.HOME, label: t("nav.home") },
+    { href: ROUTES.COUNTRIES, label: t("nav.countries") },
+    { href: ROUTES.TOPICS, label: t("nav.topics") },
+    { href: ROUTES.TABLES, label: t("nav.tables") },
+    { href: ROUTES.PODCASTS, label: t("nav.podcasts") },
+    { href: ROUTES.SANDBOX, label: t("nav.sandbox") },
+  ];
 
   return (
     <nav className="sticky top-0 z-50 border-b border-[var(--color-border)] bg-[var(--color-background)]/95 backdrop-blur supports-[backdrop-filter]:bg-[var(--color-background)]/60">
@@ -31,7 +29,7 @@ export function Navbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
             <span className="text-2xl font-bold text-[var(--color-primary)]">
-              {locale === "fa" ? "برابری" : "Barabari"}
+              {t("site.name")}
             </span>
           </Link>
 
@@ -43,7 +41,7 @@ export function Navbar() {
                 href={link.href}
                 className="rounded-lg px-3 py-2 text-sm font-medium text-[var(--color-muted-foreground)] hover:bg-[var(--color-muted)] hover:text-[var(--color-foreground)] transition-colors"
               >
-                {t(link.label)}
+                {link.label}
               </Link>
             ))}
           </div>
@@ -52,11 +50,11 @@ export function Navbar() {
           <div className="flex items-center gap-2">
             {/* Locale toggle */}
             <button
-              onClick={() => setLocale(locale === "fa" ? "en" : "fa")}
+              onClick={toggleLocale}
               className="flex items-center gap-1 rounded-lg px-2 py-1.5 text-sm text-[var(--color-muted-foreground)] hover:bg-[var(--color-muted)] transition-colors"
             >
               <Globe className="h-4 w-4" />
-              <span>{locale === "fa" ? "EN" : "فا"}</span>
+              <span>{t("nav.locale_switch")}</span>
             </button>
 
             {/* Auth buttons */}
@@ -66,19 +64,19 @@ export function Navbar() {
                   {user.displayName}
                 </span>
                 <Button variant="ghost" size="sm" onClick={logout}>
-                  {locale === "fa" ? "خروج" : "Logout"}
+                  {t("nav.logout")}
                 </Button>
               </div>
             ) : (
               <div className="hidden md:flex items-center gap-2">
                 <Link href={ROUTES.LOGIN}>
                   <Button variant="ghost" size="sm">
-                    {locale === "fa" ? "ورود" : "Login"}
+                    {t("nav.login")}
                   </Button>
                 </Link>
                 <Link href={ROUTES.SIGNUP}>
                   <Button variant="primary" size="sm">
-                    {locale === "fa" ? "ثبت‌نام" : "Sign Up"}
+                    {t("nav.signup")}
                   </Button>
                 </Link>
               </div>
@@ -110,7 +108,7 @@ export function Navbar() {
                 className="block rounded-lg px-3 py-2 text-base font-medium text-[var(--color-muted-foreground)] hover:bg-[var(--color-muted)] hover:text-[var(--color-foreground)]"
                 onClick={() => setMobileOpen(false)}
               >
-                {t(link.label)}
+                {link.label}
               </Link>
             ))}
             <div className="pt-3 border-t border-[var(--color-border)]">
@@ -122,7 +120,7 @@ export function Navbar() {
                   }}
                   className="block w-full text-start rounded-lg px-3 py-2 text-base font-medium text-[var(--color-destructive)]"
                 >
-                  {locale === "fa" ? "خروج" : "Logout"}
+                  {t("nav.logout")}
                 </button>
               ) : (
                 <div className="space-y-1">
@@ -131,7 +129,7 @@ export function Navbar() {
                     onClick={() => setMobileOpen(false)}
                   >
                     <span className="block rounded-lg px-3 py-2 text-base font-medium text-[var(--color-muted-foreground)] hover:bg-[var(--color-muted)]">
-                      {locale === "fa" ? "ورود" : "Login"}
+                      {t("nav.login")}
                     </span>
                   </Link>
                   <Link
@@ -139,7 +137,7 @@ export function Navbar() {
                     onClick={() => setMobileOpen(false)}
                   >
                     <span className="block rounded-lg px-3 py-2 text-base font-medium text-[var(--color-primary)]">
-                      {locale === "fa" ? "ثبت‌نام" : "Sign Up"}
+                      {t("nav.signup")}
                     </span>
                   </Link>
                 </div>

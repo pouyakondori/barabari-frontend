@@ -14,28 +14,10 @@ export const ROUTES = {
 } as const;
 
 export const TOPIC_CATEGORIES = [
-  {
-    slug: "fundamental-rights",
-    name: { fa: "حقوق بنیادین", en: "Fundamental Rights" },
-  },
-  {
-    slug: "power-distribution",
-    name: { fa: "قدرت و توزیع", en: "Power & Distribution" },
-  },
-  {
-    slug: "rights-justice",
-    name: { fa: "حقوق و عدالت", en: "Rights & Justice" },
-  },
-  {
-    slug: "social-economic",
-    name: { fa: "اجتماعی-اقتصادی", en: "Social & Economic" },
-  },
-  {
-    slug: "civic-duties",
-    name: { fa: "وظایف مدنی", en: "Civic Duties" },
-  },
-  {
-    slug: "constitutional-revision",
-    name: { fa: "بازنگری قانون اساسی", en: "Constitutional Revision" },
-  },
+  { slug: "fundamental-rights" },
+  { slug: "power-distribution" },
+  { slug: "rights-justice" },
+  { slug: "social-economic" },
+  { slug: "civic-duties" },
+  { slug: "constitutional-revision" },
 ] as const;

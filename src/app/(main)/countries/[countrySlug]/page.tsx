@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { TimelineStepper } from "@/components/timeline/TimelineStepper";
 import { localized, formatNumber, formatDate } from "@/lib/utils";
+import { useTranslation } from "@/locale";
 import Link from "next/link";
 import { BookOpen, Clock, Users, MapPin } from "lucide-react";
 import type { Country, Constitution, TimelineEvent, Amendment } from "@/lib/types";
@@ -16,6 +17,7 @@ import type { Country, Constitution, TimelineEvent, Amendment } from "@/lib/type
 export default function CountryProfilePage() {
   const params = useParams();
   const countrySlug = params.countrySlug as string;
+  const { t, locale } = useTranslation();
 
   const { data: countryData, loading: countryLoading } = useQuery<{ country: Country }>(GET_COUNTRY, {
     variables: { slug: countrySlug },
@@ -34,7 +36,7 @@ export default function CountryProfilePage() {
   if (countryLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <p className="text-[var(--color-muted-foreground)]">در حال بارگذاری...</p>
+        <p className="text-[var(--color-muted-foreground)]">{t("common.loading")}</p>
       </div>
     );
   }
@@ -42,7 +44,7 @@ export default function CountryProfilePage() {
   if (!country) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <p className="text-[var(--color-muted-foreground)]">کشور یافت نشد</p>
+        <p className="text-[var(--color-muted-foreground)]">{t("countries.not_found")}</p>
       </div>
     );
   }
@@ -60,11 +62,11 @@ export default function CountryProfilePage() {
           <span className="text-6xl">{country.flag}</span>
           <div>
             <h1 className="text-3xl font-bold text-[var(--color-foreground)]">
-              {localized(country.name)}
+              {localized(country.name, locale)}
             </h1>
             <p className="text-[var(--color-muted-foreground)] flex items-center gap-2 mt-1">
               <Users className="h-4 w-4" />
-              جمعیت: {formatNumber(country.population)}
+              {t("countries.population")}: {formatNumber(country.population, locale)}
             </p>
           </div>
         </div>
@@ -73,7 +75,7 @@ export default function CountryProfilePage() {
         <Card className="mb-6">
           <CardContent className="p-6">
             <p className="text-[var(--color-foreground)] leading-relaxed">
-              {localized(country.abstract)}
+              {localized(country.abstract, locale)}
             </p>
           </CardContent>
         </Card>
@@ -83,13 +85,13 @@ export default function CountryProfilePage() {
           <Link href={`/countries/${countrySlug}/constitution`}>
             <Button variant="primary">
               <BookOpen className="me-2 h-4 w-4" />
-              متن کامل قانون اساسی
+              {t("countries.full_text")}
             </Button>
           </Link>
           <Link href={`/countries/${countrySlug}/history`}>
             <Button variant="outline">
               <Clock className="me-2 h-4 w-4" />
-              تاریخچه
+              {t("history.title")}
             </Button>
           </Link>
         </div>
@@ -102,7 +104,7 @@ export default function CountryProfilePage() {
           {constitution && (
             <Card>
               <CardHeader>
-                <CardTitle>قانون اساسی</CardTitle>
+                <CardTitle>{t("countries.constitution")}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 gap-4">
@@ -110,13 +112,13 @@ export default function CountryProfilePage() {
                     <p className="text-2xl font-bold text-[var(--color-primary)]">
                       {constitution.chapters.length}
                     </p>
-                    <p className="text-sm text-[var(--color-muted-foreground)]">فصل</p>
+                    <p className="text-sm text-[var(--color-muted-foreground)]">{t("countries.chapter")}</p>
                   </div>
                   <div className="text-center p-4 rounded-lg bg-[var(--color-muted)]">
                     <p className="text-2xl font-bold text-[var(--color-primary)]">
                       {totalClauses}
                     </p>
-                    <p className="text-sm text-[var(--color-muted-foreground)]">بند</p>
+                    <p className="text-sm text-[var(--color-muted-foreground)]">{t("countries.clause")}</p>
                   </div>
                 </div>
               </CardContent>
@@ -127,7 +129,7 @@ export default function CountryProfilePage() {
           {country.authors && country.authors.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle>نویسندگان قانون اساسی</CardTitle>
+                <CardTitle>{t("countries.authors")}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -154,7 +156,7 @@ export default function CountryProfilePage() {
           {country.amendments && country.amendments.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle>اصلاحیه‌ها</CardTitle>
+                <CardTitle>{t("countries.amendments")}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
@@ -164,7 +166,7 @@ export default function CountryProfilePage() {
                         {amendment.year}
                       </span>
                       <p className="text-sm text-[var(--color-muted-foreground)]">
-                        {localized(amendment.description)}
+                        {localized(amendment.description, locale)}
                       </p>
                     </div>
                   ))}
@@ -178,12 +180,12 @@ export default function CountryProfilePage() {
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle>رویدادهای تاریخی</CardTitle>
+                  <CardTitle>{t("countries.timeline_events")}</CardTitle>
                   <Link
                     href={`/countries/${countrySlug}/history`}
                     className="text-sm text-[var(--color-primary)] hover:underline"
                   >
-                    مشاهده همه
+                    {t("countries.view_all")}
                   </Link>
                 </div>
               </CardHeader>

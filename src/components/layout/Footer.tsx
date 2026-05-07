@@ -1,7 +1,12 @@
+"use client";
+
 import Link from "next/link";
 import { ROUTES } from "@/lib/constants";
+import { useTranslation } from "@/locale";
 
 export function Footer() {
+  const { t } = useTranslation();
+
   return (
     <footer className="border-t border-[var(--color-border)] bg-[var(--color-muted)]">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
@@ -9,17 +14,17 @@ export function Footer() {
           {/* Brand */}
           <div>
             <h3 className="text-xl font-bold text-[var(--color-primary)]">
-              برابری
+              {t("footer.brand")}
             </h3>
             <p className="mt-2 text-sm text-[var(--color-muted-foreground)]">
-              پلتفرم تحلیل و مقایسه قوانین اساسی جهان
+              {t("footer.description")}
             </p>
           </div>
 
           {/* Links */}
           <div>
             <h4 className="font-semibold text-[var(--color-foreground)]">
-              لینک‌ها
+              {t("footer.links")}
             </h4>
             <ul className="mt-3 space-y-2">
               <li>
@@ -27,7 +32,7 @@ export function Footer() {
                   href={ROUTES.COUNTRIES}
                   className="text-sm text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)]"
                 >
-                  کشورها
+                  {t("nav.countries")}
                 </Link>
               </li>
               <li>
@@ -35,7 +40,7 @@ export function Footer() {
                   href={ROUTES.TOPICS}
                   className="text-sm text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)]"
                 >
-                  موضوعات
+                  {t("nav.topics")}
                 </Link>
               </li>
               <li>
@@ -43,7 +48,7 @@ export function Footer() {
                   href={ROUTES.TABLES}
                   className="text-sm text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)]"
                 >
-                  جداول مقایسه‌ای
+                  {t("nav.tables")}
                 </Link>
               </li>
               <li>
@@ -51,7 +56,7 @@ export function Footer() {
                   href={ROUTES.ABOUT}
                   className="text-sm text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)]"
                 >
-                  درباره ما
+                  {t("nav.about")}
                 </Link>
               </li>
             </ul>
@@ -60,7 +65,7 @@ export function Footer() {
           {/* Legal */}
           <div>
             <h4 className="font-semibold text-[var(--color-foreground)]">
-              حقوقی
+              {t("footer.legal")}
             </h4>
             <ul className="mt-3 space-y-2">
               <li>
@@ -68,7 +73,7 @@ export function Footer() {
                   href={ROUTES.PRIVACY}
                   className="text-sm text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)]"
                 >
-                  حریم خصوصی
+                  {t("footer.privacy")}
                 </Link>
               </li>
               <li>
@@ -76,7 +81,7 @@ export function Footer() {
                   href={ROUTES.TERMS}
                   className="text-sm text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)]"
                 >
-                  شرایط استفاده
+                  {t("footer.terms")}
                 </Link>
               </li>
             </ul>
@@ -85,7 +90,7 @@ export function Footer() {
 
         <div className="mt-8 border-t border-[var(--color-border)] pt-8 text-center">
           <p className="text-sm text-[var(--color-muted-foreground)]">
-            © ۲۰۲۶ برابری. تمامی حقوق محفوظ است.
+            {t("footer.copyright")}
           </p>
         </div>
       </div>

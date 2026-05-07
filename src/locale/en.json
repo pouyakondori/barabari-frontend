@@ -1,0 +1,181 @@
+{
+  "site": {
+    "name": "Barabari",
+    "title": "Barabari — Constitutional Analysis & Comparison",
+    "description": "A platform for constitutional analysis and comparison for Iranian citizens"
+  },
+  "nav": {
+    "home": "Home",
+    "countries": "Countries",
+    "topics": "Topics",
+    "tables": "Comparison Tables",
+    "podcasts": "Podcasts",
+    "sandbox": "Sandbox",
+    "about": "About",
+    "login": "Login",
+    "signup": "Sign Up",
+    "logout": "Logout",
+    "locale_switch": "فا"
+  },
+  "home": {
+    "hero_title": "Know Your Constitution",
+    "hero_subtitle": "In-depth analysis and comparison of world constitutions for Iranian citizens. Knowledge is the first step toward sovereignty.",
+    "explore_countries": "Explore Countries",
+    "topics_btn": "Topics",
+    "stats_countries": "Countries",
+    "stats_clauses": "Clauses",
+    "stats_votes": "Votes",
+    "stats_comments": "Comments",
+    "featured_countries": "Featured Countries",
+    "featured_countries_desc": "Explore and compare constitutions of different countries",
+    "featured_topics": "Key Topics",
+    "featured_topics_desc": "Explore legal topics from the perspective of constitutions"
+  },
+  "countries": {
+    "title": "Countries",
+    "description": "Explore constitutions of different countries",
+    "not_found": "Country not found",
+    "population": "Population",
+    "constitution": "Constitution",
+    "history": "History",
+    "full_text": "Full Constitution Text",
+    "full_text_short": "Full Text",
+    "chapter": "Chapter",
+    "article": "Article",
+    "clause": "Clause",
+    "amendments": "Amendments",
+    "authors": "Constitution Authors",
+    "timeline_events": "Historical Events",
+    "view_all": "View All",
+    "back_to": "Back to",
+    "fallback_country": "Country"
+  },
+  "history": {
+    "title": "History",
+    "subtitle": "Key political and legal events",
+    "no_events": "No events recorded yet."
+  },
+  "constitution": {
+    "title": "Constitution",
+    "not_found": "Constitution not found.",
+    "back_to_constitution": "Back to Constitution"
+  },
+  "clause": {
+    "title": "Clause",
+    "not_found": "Clause not found",
+    "agree": "Agree",
+    "disagree": "Disagree",
+    "login_to_vote": "Login to vote"
+  },
+  "comments": {
+    "title": "Comments",
+    "placeholder": "Write your comment...",
+    "login_prompt": "Login",
+    "login_suffix": "to comment.",
+    "pending_approval": "Pending approval",
+    "delete": "Delete",
+    "no_comments": "No comments yet."
+  },
+  "topics": {
+    "title": "Topics",
+    "description": "Legal and civic topics in world constitutions",
+    "not_found": "Topic not found",
+    "back_to_topics": "Back to Topics",
+    "no_clauses": "No clauses found for this topic"
+  },
+  "tables": {
+    "title": "Comparison Tables",
+    "description": "Compare constitutional clauses across countries by topic",
+    "back_to_tables": "Back to Tables",
+    "fallback_title": "Comparison Table",
+    "popular_clauses": "Popular Clauses",
+    "header_clause": "Clause",
+    "header_text": "Text"
+  },
+  "podcasts": {
+    "title": "Podcasts",
+    "description": "Analytical podcasts about constitutions of different countries",
+    "coming_soon": "Coming Soon",
+    "coming_soon_desc": "Barabari analytical podcasts will be published soon."
+  },
+  "sandbox": {
+    "title": "Constitution Sandbox",
+    "description": "Build your ideal constitution by selecting clauses from different countries",
+    "coming_soon": "Coming Soon",
+    "coming_soon_desc": "The constitution builder tool will be available soon."
+  },
+  "about": {
+    "title": "About Barabari",
+    "mission_title": "Our Mission",
+    "mission_text": "In an era of transformation, understanding the bedrock of a nation — its Constitution — is no longer a scholarly pursuit, but a civic necessity. We bridge the gap between legal complexity and public awareness by launching a comprehensive analytical platform dedicated to the Iranian people.",
+    "goal_title": "Our Goal",
+    "goal_text": "To illuminate the profound impact of constitutional law on the daily lives of citizens. By dissecting the current Iranian legal structure and placing it alongside the diverse governance frameworks of the international community, we provide a mirror for reflection and a window for inspiration.",
+    "architecture_title": "Architecture of Awareness",
+    "architecture_items": [
+      "Deep analysis: Stripping away legal jargon to reveal core mechanisms",
+      "Global perspective: Examining how nations address fundamental freedoms",
+      "Data-driven comparison: Heat maps and popularity rankings",
+      "Collaborative vision: An intellectual laboratory for citizen participation"
+    ]
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "intro": "User privacy is very important to us. This page explains what information we collect and how we use it.",
+    "collected_title": "Information Collected",
+    "collected_text": "We only collect information necessary to provide better services, including email address and display name during registration.",
+    "usage_title": "Use of Information",
+    "usage_text": "Your information is only used to provide platform services and is not shared with any third parties."
+  },
+  "terms": {
+    "title": "Terms of Service",
+    "intro": "By using the Barabari platform, you accept the following terms.",
+    "responsible_title": "Responsible Use",
+    "responsible_text": "Users are required to use the platform responsibly. Comments must be respectful and constructive. All comments are reviewed and approved by an administrator before publication.",
+    "content_title": "User Content",
+    "content_text": "By submitting a comment or vote, you take responsibility for your submitted content. Barabari reserves the right to remove inappropriate content."
+  },
+  "auth": {
+    "login_title": "Login to Barabari",
+    "signup_title": "Sign Up for Barabari",
+    "forgot_title": "Forgot Password",
+    "email": "Email",
+    "password": "Password",
+    "display_name": "Display Name",
+    "login_btn": "Login",
+    "signup_btn": "Sign Up",
+    "logging_in": "Logging in...",
+    "signing_up": "Signing up...",
+    "no_account": "Don't have an account?",
+    "have_account": "Already have an account?",
+    "forgot_password": "Forgot Password",
+    "reset_link_sent": "If an account with this email exists, a password reset link will be sent.",
+    "back_to_login": "Back to Login Page",
+    "send_reset_link": "Send Reset Link",
+    "back_to_login_short": "Back to Login",
+    "password_placeholder": "At least 8 characters",
+    "login_error": "Login failed",
+    "signup_error": "Sign up failed"
+  },
+  "footer": {
+    "brand": "Barabari",
+    "description": "A platform for constitutional analysis and comparison worldwide",
+    "links": "Links",
+    "legal": "Legal",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "copyright": "© 2026 Barabari. All rights reserved."
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "back": "Back"
+  },
+  "categories": {
+    "fundamental-rights": "Fundamental Rights",
+    "power-distribution": "Power & Distribution",
+    "rights-justice": "Rights & Justice",
+    "social-economic": "Social & Economic",
+    "civic-duties": "Civic Duties",
+    "constitutional-revision": "Constitutional Revision"
+  }
+}

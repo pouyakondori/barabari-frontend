@@ -3,6 +3,7 @@
 import { ThumbsUp, ThumbsDown } from "lucide-react";
 import { cn, formatNumber } from "@/lib/utils";
 import { useVote } from "@/hooks/useVote";
+import { useTranslation } from "@/locale";
 import Link from "next/link";
 import { ROUTES } from "@/lib/constants";
 
@@ -18,23 +19,24 @@ export function VoteButtons({
   disagreeCount,
 }: VoteButtonsProps) {
   const { myVote, vote, removeVote, isAuthenticated } = useVote(clauseId);
+  const { t, locale } = useTranslation();
 
   if (!isAuthenticated) {
     return (
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2 text-[var(--color-muted-foreground)]">
           <ThumbsUp className="h-4 w-4" />
-          <span className="text-sm">{formatNumber(agreeCount)}</span>
+          <span className="text-sm">{formatNumber(agreeCount, locale)}</span>
         </div>
         <div className="flex items-center gap-2 text-[var(--color-muted-foreground)]">
           <ThumbsDown className="h-4 w-4" />
-          <span className="text-sm">{formatNumber(disagreeCount)}</span>
+          <span className="text-sm">{formatNumber(disagreeCount, locale)}</span>
         </div>
         <Link
           href={ROUTES.LOGIN}
           className="text-xs text-[var(--color-primary)] hover:underline"
         >
-          برای رأی دادن وارد شوید
+          {t("clause.login_to_vote")}
         </Link>
       </div>
     );
@@ -60,7 +62,7 @@ export function VoteButtons({
         )}
       >
         <ThumbsUp className="h-4 w-4" />
-        <span>{formatNumber(agreeCount)}</span>
+        <span>{formatNumber(agreeCount, locale)}</span>
       </button>
       <button
         onClick={() => handleVote("disagree")}
@@ -72,7 +74,7 @@ export function VoteButtons({
         )}
       >
         <ThumbsDown className="h-4 w-4" />
-        <span>{formatNumber(disagreeCount)}</span>
+        <span>{formatNumber(disagreeCount, locale)}</span>
       </button>
     </div>
   );

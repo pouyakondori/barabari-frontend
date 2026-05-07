@@ -6,6 +6,7 @@ import { formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useComments } from "@/hooks/useComments";
+import { useTranslation } from "@/locale";
 import Link from "next/link";
 import { ROUTES } from "@/lib/constants";
 import type { Comment } from "@/lib/types";
@@ -23,6 +24,7 @@ export function CommentThread({ clauseId }: CommentThreadProps) {
     isAuthenticated,
     currentUserId,
   } = useComments(clauseId);
+  const { t, locale } = useTranslation();
   const [newComment, setNewComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -46,7 +48,7 @@ export function CommentThread({ clauseId }: CommentThreadProps) {
     <div className="space-y-4">
       <h3 className="flex items-center gap-2 font-semibold text-[var(--color-foreground)]">
         <MessageCircle className="h-5 w-5" />
-        نظرات ({topLevelComments.length})
+        {t("comments.title")} ({topLevelComments.length})
       </h3>
 
       {/* Comment form */}
@@ -56,7 +58,7 @@ export function CommentThread({ clauseId }: CommentThreadProps) {
             type="text"
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
-            placeholder="نظر خود را بنویسید..."
+            placeholder={t("comments.placeholder")}
             className="flex-1 rounded-lg border border-[var(--color-border)] bg-[var(--color-background)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
             disabled={submitting}
           />
@@ -74,20 +76,20 @@ export function CommentThread({ clauseId }: CommentThreadProps) {
             href={ROUTES.LOGIN}
             className="text-[var(--color-primary)] hover:underline"
           >
-            وارد شوید
+            {t("comments.login_prompt")}
           </Link>{" "}
-          تا نظر بدهید.
+          {t("comments.login_suffix")}
         </p>
       )}
 
       {/* Comments list */}
       {loading ? (
         <p className="text-sm text-[var(--color-muted-foreground)]">
-          در حال بارگذاری...
+          {t("common.loading")}
         </p>
       ) : topLevelComments.length === 0 ? (
         <p className="text-sm text-[var(--color-muted-foreground)]">
-          هنوز نظری ثبت نشده است.
+          {t("comments.no_comments")}
         </p>
       ) : (
         <div className="space-y-3">
@@ -102,20 +104,20 @@ export function CommentThread({ clauseId }: CommentThreadProps) {
                     {comment.userName}
                   </span>
                   <span className="text-xs text-[var(--color-muted-foreground)]">
-                    {formatDate(comment.createdAt)}
+                    {formatDate(comment.createdAt, locale)}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   {comment.status === "pending" &&
                     comment.userId === currentUserId && (
-                      <Badge variant="warning">در انتظار تأیید</Badge>
+                      <Badge variant="warning">{t("comments.pending_approval")}</Badge>
                     )}
                   {comment.userId === currentUserId && (
                     <button
                       onClick={() => deleteComment(comment.id)}
                       className="text-xs text-[var(--color-destructive)] hover:underline"
                     >
-                      حذف
+                      {t("comments.delete")}
                     </button>
                   )}
                 </div>

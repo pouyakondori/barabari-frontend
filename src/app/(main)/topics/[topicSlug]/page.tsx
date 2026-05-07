@@ -8,6 +8,7 @@ import { GET_COUNTRIES } from "@/graphql/queries/countries";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { localized } from "@/lib/utils";
+import { useTranslation } from "@/locale";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import type { Topic, Country, Clause, Constitution } from "@/lib/types";
@@ -15,6 +16,7 @@ import type { Topic, Country, Clause, Constitution } from "@/lib/types";
 export default function TopicPage() {
   const params = useParams();
   const topicSlug = params.topicSlug as string;
+  const { t, locale } = useTranslation();
 
   const { data: topicData, loading: topicLoading } = useQuery<{ topic: Topic }>(GET_TOPIC, {
     variables: { slug: topicSlug },
@@ -27,7 +29,7 @@ export default function TopicPage() {
   if (topicLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <p className="text-[var(--color-muted-foreground)]">در حال بارگذاری...</p>
+        <p className="text-[var(--color-muted-foreground)]">{t("common.loading")}</p>
       </div>
     );
   }
@@ -35,7 +37,7 @@ export default function TopicPage() {
   if (!topic) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <p className="text-[var(--color-muted-foreground)]">موضوع یافت نشد</p>
+        <p className="text-[var(--color-muted-foreground)]">{t("topics.not_found")}</p>
       </div>
     );
   }
@@ -47,16 +49,16 @@ export default function TopicPage() {
         className="inline-flex items-center gap-1 text-sm text-[var(--color-primary)] hover:underline mb-6"
       >
         <ArrowRight className="h-4 w-4" />
-        بازگشت به موضوعات
+        {t("topics.back_to_topics")}
       </Link>
 
       <div className="mb-8">
         <Badge variant="outline" className="mb-2">{topic.category}</Badge>
         <h1 className="text-3xl font-bold text-[var(--color-foreground)]">
-          {localized(topic.name)}
+          {localized(topic.name, locale)}
         </h1>
         <p className="mt-2 text-[var(--color-muted-foreground)]">
-          {localized(topic.description)}
+          {localized(topic.description, locale)}
         </p>
       </div>
 
@@ -71,6 +73,7 @@ export default function TopicPage() {
 }
 
 function CountryTopicCard({ country, topicSlug }: { country: Country; topicSlug: string }) {
+  const { t, locale } = useTranslation();
   const { data } = useQuery<{ constitution: Constitution }>(GET_CONSTITUTION, {
     variables: { countrySlug: country.slug },
   });
@@ -95,13 +98,13 @@ function CountryTopicCard({ country, topicSlug }: { country: Country; topicSlug:
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <span className="text-2xl">{country.flag}</span>
-          {localized(country.name)}
+          {localized(country.name, locale)}
         </CardTitle>
       </CardHeader>
       <CardContent>
         {matchingClauses.length === 0 ? (
           <p className="text-sm text-[var(--color-muted-foreground)]">
-            بندی مرتبط با این موضوع یافت نشد
+            {t("topics.no_clauses")}
           </p>
         ) : (
           <div className="space-y-3">
@@ -112,7 +115,7 @@ function CountryTopicCard({ country, topicSlug }: { country: Country; topicSlug:
                 className="block p-3 rounded-lg border border-[var(--color-border)] hover:bg-[var(--color-muted)] transition-colors"
               >
                 <p className="text-sm text-[var(--color-foreground)] line-clamp-3">
-                  {localized(clause.text)}
+                  {localized(clause.text, locale)}
                 </p>
                 <div className="flex items-center gap-3 mt-2 text-xs text-[var(--color-muted-foreground)]">
                   <span>👍 {clause.agreeCount}</span>
