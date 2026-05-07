@@ -13,6 +13,7 @@
 | Language | TypeScript (strict mode) |
 | Styling | Tailwind CSS + shadcn/ui component library |
 | State management | React Context + TanStack Query (server state) |
+| GraphQL | Apollo Client + GraphQL Code Generator (typed hooks) |
 | Auth | NextAuth.js (credentials + OAuth providers) |
 | Forms | React Hook Form + Zod validation |
 | i18n | next-intl (RTL/Persian + English) |
@@ -72,11 +73,15 @@ components/
 ├── timeline/            # TimelineEvent, TimelineStepper
 └── media/               # PodcastPlayer, VideoEmbed
 lib/
-├── api.ts               # API client / fetch wrappers
+├── apollo.ts            # Apollo Client instance & cache config
 ├── auth.ts              # NextAuth config
 ├── types.ts             # Shared TypeScript interfaces
 ├── constants.ts         # Topic categories, route constants
 └── utils.ts             # Helpers (slug, format, RTL…)
+graphql/
+├── queries/             # .graphql query documents (countries, clauses, topics…)
+├── mutations/           # .graphql mutation documents (vote, comment, auth…)
+└── generated/           # Auto-generated types & hooks (GraphQL Code Generator)
 hooks/
 ├── useAuth.ts
 ├── useVote.ts
@@ -394,40 +399,101 @@ interface HeatmapEntry {
 
 ---
 
-## 5. API Endpoints (Backend Contract)
+## 5. GraphQL Integration (Backend Contract)
 
-These are the API routes the frontend expects. They can be Next.js API routes (for MVP) or a separate backend.
+The frontend communicates with the backend via a **GraphQL API** (Apollo Server + TypeGraphQL). See `docs/implementation-plan-backend.md` for the full schema.
 
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| GET | `/api/countries` | No | List all countries |
-| GET | `/api/countries/[slug]` | No | Country details |
-| GET | `/api/countries/[slug]/constitution` | No | Full constitution with chapters/articles/clauses |
-| GET | `/api/countries/[slug]/history` | No | Timeline events |
-| GET | `/api/clauses/[id]` | No | Single clause with votes & comments |
-| POST | `/api/votes` | Yes | Cast vote `{ clauseId, type: "agree"|"disagree" }` |
-| DELETE | `/api/votes/[id]` | Yes | Remove vote |
-| GET | `/api/comments?clauseId=X` | No | List comments for a clause |
-| POST | `/api/comments` | Yes | Create comment |
-| DELETE | `/api/comments/[id]` | Yes | Delete own comment |
-| GET | `/api/topics` | No | List all topics |
-| GET | `/api/topics/[slug]` | No | Topic detail with comparison data |
-| GET | `/api/tables` | No | List comparison tables |
-| GET | `/api/tables/[id]` | No | Table data with rankings & heatmap |
-| GET | `/api/podcasts` | No | List podcast episodes |
-| POST | `/api/chat` | No | AI chat (streaming) |
-| POST | `/api/auth/[...nextauth]` | — | Auth routes (NextAuth) |
+### Frontend GraphQL Setup
+
+| Item | Detail |
+|---|---|
+| Client | Apollo Client 3 with `InMemoryCache` |
+| Code generation | `@graphql-codegen/cli` with `typescript`, `typescript-operations`, `typescript-react-apollo` plugins |
+| Auth header | `Authorization: Bearer <accessToken>` injected via Apollo Link |
+| SSR | Apollo Client integrated with Next.js App Router (RSC-compatible) |
+| Config file | `codegen.ts` pointing at backend schema URL |
+
+### Key Queries Used by Frontend
+
+| Page | Query / Mutation |
+|---|---|
+| Landing | `platformStats`, `featuredCountries` |
+| Country Profile | `country(slug)`, `constitution(countrySlug)`, `countryTimeline(countrySlug)` |
+| Constitution Text | `constitution(countrySlug)` with full nested chapters/articles/clauses |
+| Clause Detail | `clause(id)`, `comments(clauseId)`, `relatedClauses(clauseId)`, `myVotes(clauseIds)` |
+| Topic Comparison | `topic(slug)`, `clausesByTopic(topicSlug)` |
+| Comparison Tables | `comparisonTables`, `comparisonTable(topicSlug)`, `heatmapData(topicSlug)` |
+| Podcasts | `podcasts(countrySlug?, topicSlug?)` |
+| Sandbox | `mySandboxes`, `createSandbox`, `updateSandbox`, `deleteSandbox` |
+| Auth | `login`, `register`, `refreshToken`, `forgotPassword`, `resetPassword`, `me` |
+| Voting | `castVote(input)`, `removeVote(clauseId)` |
+| Comments | `createComment(input)`, `updateComment`, `deleteComment` |
+| AI Chat | REST `POST /api/chat` (SSE streaming — not GraphQL) |
+
+### Apollo Client Configuration
+
+```typescript
+// lib/apollo.ts
+import { ApolloClient, InMemoryCache, createHttpLink } from "@apollo/client";
+import { setContext } from "@apollo/client/link/context";
+
+const httpLink = createHttpLink({
+  uri: process.env.NEXT_PUBLIC_GRAPHQL_URL, // e.g. http://localhost:4000/graphql
+});
+
+const authLink = setContext((_, { headers }) => {
+  const token = typeof window !== "undefined"
+    ? localStorage.getItem("accessToken")
+    : null;
+  return {
+    headers: { ...headers, authorization: token ? `Bearer ${token}` : "" },
+  };
+});
+
+export const apolloClient = new ApolloClient({
+  link: authLink.concat(httpLink),
+  cache: new InMemoryCache(),
+});
+```
+
+### GraphQL Code Generator Config
+
+```typescript
+// codegen.ts
+import type { CodegenConfig } from "@graphql-codegen/cli";
+
+const config: CodegenConfig = {
+  schema: "http://localhost:4000/graphql",
+  documents: "graphql/**/*.graphql",
+  generates: {
+    "graphql/generated/index.ts": {
+      plugins: [
+        "typescript",
+        "typescript-operations",
+        "typescript-react-apollo",
+      ],
+      config: {
+        withHooks: true,
+        withComponent: false,
+      },
+    },
+  },
+};
+
+export default config;
+```
 
 ---
 
 ## 6. Key Technical Decisions
 
 1. **App Router over Pages Router** — Leverages React Server Components for faster page loads and better SEO for constitution texts.
-2. **RTL-first design** — Tailwind's `dir="rtl"` with logical properties (`ps-4` instead of `pl-4`). Persian as the default locale.
-3. **Server Components by default** — Only add `"use client"` for interactive components (votes, comments, chat, forms).
-4. **Incremental Static Regeneration (ISR)** — Country pages and constitution texts are largely static; revalidate periodically.
-5. **Optimistic UI for votes/comments** — Instant feedback, reconciled with server response.
-6. **Streaming for AI chat** — Uses edge runtime + Vercel AI SDK for real-time token streaming.
+2. **GraphQL over REST** — Apollo Client + GraphQL Code Generator for type-safe data fetching. The backend uses TypeGraphQL (code-first schema). Only exception: AI chat uses REST/SSE for token streaming.
+3. **RTL-first design** — Tailwind's `dir="rtl"` with logical properties (`ps-4` instead of `pl-4`). Persian as the default locale.
+4. **Server Components by default** — Only add `"use client"` for interactive components (votes, comments, chat, forms).
+5. **Incremental Static Regeneration (ISR)** — Country pages and constitution texts are largely static; revalidate periodically.
+6. **Optimistic UI for votes/comments** — Instant feedback via Apollo Client cache updates, reconciled with server response.
+7. **Streaming for AI chat** — Uses edge runtime + Vercel AI SDK for real-time token streaming (REST endpoint, not GraphQL).
 
 ---
 
@@ -435,7 +501,8 @@ These are the API routes the frontend expects. They can be Next.js API routes (f
 
 | Need | Options |
 |---|---|
-| Database | PostgreSQL (Supabase / Neon) or MongoDB Atlas |
+| Database | MongoDB Atlas (see backend plan) |
+| GraphQL Server | Apollo Server 4 + TypeGraphQL (see `implementation-plan-backend.md`) |
 | Auth provider | NextAuth.js with database adapter |
 | AI/LLM | OpenAI API / Anthropic API via Vercel AI SDK |
 | File storage | Cloudflare R2 / AWS S3 (PDF constitutions) |
