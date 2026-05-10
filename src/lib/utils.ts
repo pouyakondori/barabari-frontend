@@ -26,6 +26,21 @@ export function localizeNumber(value: string | number, locale: string): string {
   return locale === "fa" ? toPersianDigits(value) : String(value);
 }
 
+const GDP_UNIT_KEYS: Record<string, string> = {
+  trillion: "countries.gdp_trillion",
+  billion: "countries.gdp_billion",
+  million: "countries.gdp_million",
+  thousand: "countries.gdp_thousand",
+};
+
+export function localizeGdp(value: string, locale: string, t: (key: string) => string): string {
+  let result = locale === "fa" ? toPersianDigits(value) : value;
+  for (const [en, key] of Object.entries(GDP_UNIT_KEYS)) {
+    result = result.replace(new RegExp(en, "gi"), t(key));
+  }
+  return result;
+}
+
 export function formatDate(date: string, locale: string = "fa"): string {
   return new Intl.DateTimeFormat(locale === "fa" ? "fa-IR" : "en-US", {
     year: "numeric",

@@ -9,7 +9,7 @@ import { GET_PODCASTS_BY_COUNTRY } from "@/graphql/queries/podcasts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { TimelineStepper } from "@/components/timeline/TimelineStepper";
-import { localized, formatNumber, formatDate, localizeNumber } from "@/lib/utils";
+import { localized, formatNumber, formatDate, localizeNumber, localizeGdp } from "@/lib/utils";
 import { useTranslation } from "@/locale";
 import Link from "next/link";
 import { BookOpen, Clock, Users, Info } from "lucide-react";
@@ -193,7 +193,7 @@ export default function CountryProfilePage() {
                   <div className="flex items-center justify-between py-2.5">
                     <span className="text-sm text-[var(--color-muted-foreground)]">{t("countries.gdp")}</span>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-[var(--color-foreground)]">{localizeNumber(country.gdp, locale)}</span>
+                      <span className="text-sm font-medium text-[var(--color-foreground)]">{localizeGdp(country.gdp, locale, t)}</span>
                       {country.economicType && (
                         <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[11px] font-medium text-blue-700 leading-none">
                           {translateEnum(t, "economic_types", country.economicType)}
