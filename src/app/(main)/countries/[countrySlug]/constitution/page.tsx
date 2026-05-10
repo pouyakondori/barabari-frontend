@@ -63,7 +63,7 @@ export default function ConstitutionPage() {
               <Card key={chapter.id}>
                 <CardContent className="p-6">
                   <h2 className="text-xl font-bold text-[var(--color-foreground)] mb-4 pb-2 border-b border-[var(--color-border)]">
-                    {t("countries.chapter")} {chapter.number}: {localized(chapter.title, locale)}
+                    {t("countries.chapter")} {localizeNumber(chapter.number, locale)}: {localized(chapter.title, locale)}
                   </h2>
 
                   <div className="space-y-6">
@@ -74,7 +74,7 @@ export default function ConstitutionPage() {
                         <div key={article.id}>
                           {article.title && (
                             <h3 className="font-semibold text-[var(--color-foreground)] mb-3">
-                              {t("countries.article")} {article.number}: {localized(article.title, locale)}
+                              {t("countries.article")} {localizeNumber(article.number, locale)}: {localized(article.title, locale)}
                             </h3>
                           )}
 
@@ -90,7 +90,7 @@ export default function ConstitutionPage() {
                                 >
                                   <div className="flex items-start gap-2">
                                     <span className="text-sm font-medium text-[var(--color-primary)] shrink-0">
-                                      {t("countries.clause")} {clause.number}:
+                                      {t("countries.clause")} {localizeNumber(clause.number, locale)}:
                                     </span>
                                     <p className="text-sm text-[var(--color-foreground)] leading-relaxed group-hover:text-[var(--color-primary)]">
                                       {localized(clause.text, locale)}

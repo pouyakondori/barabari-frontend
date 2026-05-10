@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { VoteButtons } from "@/components/votes/VoteButtons";
 import { CommentThread } from "@/components/comments/CommentThread";
-import { localized } from "@/lib/utils";
+import { localized, localizeNumber } from "@/lib/utils";
 import { useTranslation } from "@/locale";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
@@ -60,7 +60,7 @@ export default function ClauseDetailPage() {
       <Card className="mb-8">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>{t("clause.title")} {clause.number}</CardTitle>
+            <CardTitle>{t("clause.title")} {localizeNumber(clause.number, locale)}</CardTitle>
             <div className="flex gap-1">
               {clause.topicSlugs.map((slug: string) => (
                 <Link key={slug} href={`/topics/${slug}`}>

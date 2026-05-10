@@ -296,13 +296,13 @@ export default function CountryProfilePage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-center p-4 rounded-lg bg-[var(--color-muted)]">
                     <p className="text-2xl font-bold text-[var(--color-primary)]">
-                      {constitution.chapters.length}
+                      {localizeNumber(constitution.chapters.length, locale)}
                     </p>
                     <p className="text-sm text-[var(--color-muted-foreground)]">{t("countries.chapter")}</p>
                   </div>
                   <div className="text-center p-4 rounded-lg bg-[var(--color-muted)]">
                     <p className="text-2xl font-bold text-[var(--color-primary)]">
-                      {totalClauses}
+                      {localizeNumber(totalClauses, locale)}
                     </p>
                     <p className="text-sm text-[var(--color-muted-foreground)]">{t("countries.clause")}</p>
                   </div>
@@ -349,7 +349,7 @@ export default function CountryProfilePage() {
                   {country.amendments.map((amendment: Amendment, i: number) => (
                     <div key={i} className="flex items-start gap-2">
                       <span className="inline-flex h-6 min-w-[3rem] items-center justify-center rounded bg-[var(--color-primary)] text-xs text-white font-medium">
-                        {amendment.year}
+                        {localizeNumber(amendment.year, locale)}
                       </span>
                       <p className="text-sm text-[var(--color-muted-foreground)]">
                         {localized(amendment.description, locale)}

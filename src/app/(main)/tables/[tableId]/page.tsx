@@ -108,7 +108,7 @@ function CountryClauseList({ country, topicSlug }: { country: Country; topicSlug
             {sorted.map((clause: Clause) => (
               <tr key={clause.id} className="border-b border-[var(--color-border)] last:border-0">
                 <td className="py-3 pe-3 text-[var(--color-primary)] font-medium whitespace-nowrap">
-                  {t("countries.clause")} {clause.number}
+                  {t("countries.clause")} {localizeNumber(clause.number, locale)}
                 </td>
                 <td className="py-3">
                   <Link
