@@ -19,6 +19,11 @@ export interface Amendment {
   description: LocalizedString;
 }
 
+export interface ReligiousComposition {
+  religion: string;
+  percentage: number;
+}
+
 export interface Country {
   id: string;
   slug: string;
@@ -32,6 +37,15 @@ export interface Country {
   podcastUrl?: string;
   videoUrl?: string;
   countryCode: string;
+  systemOfGovernment?: string;
+  hdi?: number;
+  independenceDate?: string;
+  officialLanguages?: string[];
+  gdp?: string;
+  economicType?: string;
+  religiousComposition?: ReligiousComposition[];
+  urbanizationRate?: number;
+  corruptionIndex?: number;
   createdAt: string;
   updatedAt: string;
 }

@@ -58,6 +58,18 @@ export const GET_COUNTRY = gql`
       podcastUrl
       videoUrl
       countryCode
+      systemOfGovernment
+      hdi
+      independenceDate
+      officialLanguages
+      gdp
+      economicType
+      religiousComposition {
+        religion
+        percentage
+      }
+      urbanizationRate
+      corruptionIndex
     }
   }
 `;
