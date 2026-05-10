@@ -143,6 +143,8 @@
     "economic_type": "Economic Type",
     "religious_composition": "Religious Composition",
     "urbanization_rate": "Urbanization Rate",
+    "hdi": "Human Development Index (HDI)",
+    "hdi_tooltip": "The Human Development Index (HDI) by the United Nations measures a country's average achievement in health, education, and standard of living. Score: 0–1 (higher means more developed).",
     "corruption_index": "Corruption Perceptions Index (CPI)",
     "corruption_index_tooltip": "The Corruption Perceptions Index (CPI) by Transparency International ranks countries by their perceived levels of public sector corruption. Score: 0–100 (higher means less corruption).",
     "very_high": "Very High",
