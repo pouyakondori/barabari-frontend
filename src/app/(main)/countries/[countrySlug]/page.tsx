@@ -170,7 +170,11 @@ export default function CountryProfilePage() {
                 {country.systemOfGovernment && (
                   <div className="flex items-center justify-between py-2.5">
                     <span className="text-sm text-[var(--color-muted-foreground)]">{t("countries.system_of_government")}</span>
-                    <span className="text-sm font-medium text-[var(--color-foreground)]">{country.systemOfGovernment}</span>
+                    <span className="text-sm font-medium text-[var(--color-foreground)]">
+                      {t(`countries.government_types.${country.systemOfGovernment}`) !== `countries.government_types.${country.systemOfGovernment}`
+                        ? t(`countries.government_types.${country.systemOfGovernment}`)
+                        : country.systemOfGovernment}
+                    </span>
                   </div>
                 )}
 
