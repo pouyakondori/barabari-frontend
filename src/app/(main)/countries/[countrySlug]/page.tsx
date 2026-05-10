@@ -12,6 +12,7 @@ import { localized, formatNumber, formatDate } from "@/lib/utils";
 import { useTranslation } from "@/locale";
 import Link from "next/link";
 import { BookOpen, Clock, Users, Info } from "lucide-react";
+import { GeographicCard } from "@/components/country/GeographicCard";
 import type { Country, Constitution, TimelineEvent, Amendment, ReligiousComposition } from "@/lib/types";
 
 function HdiLabel({ value, t }: { value: number; t: (key: string) => string }) {
@@ -264,6 +265,9 @@ export default function CountryProfilePage() {
           </CardContent>
         </Card>
       )}
+
+      {/* Geographic Data Section */}
+      <GeographicCard country={country} />
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         {/* Main content */}

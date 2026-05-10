@@ -38,11 +38,16 @@ export const GET_COUNTRY = gql`
       coordinates {
         lat
         lng
+        zoom
       }
       abstract {
         fa
         en
       }
+      totalArea
+      landlocked
+      borders
+      naturalResources
       authors {
         name
         bio

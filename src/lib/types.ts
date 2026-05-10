@@ -6,6 +6,7 @@ export interface LocalizedString {
 export interface Coordinates {
   lat: number;
   lng: number;
+  zoom?: number;
 }
 
 export interface Author {
@@ -32,6 +33,10 @@ export interface Country {
   population: number;
   coordinates: Coordinates;
   abstract: LocalizedString;
+  totalArea?: number;
+  landlocked?: boolean;
+  borders?: string[];
+  naturalResources?: string[];
   authors: Author[];
   amendments: Amendment[];
   podcastUrl?: string;
