@@ -152,129 +152,117 @@ export default function CountryProfilePage() {
 
       {/* Quick Facts Section */}
       {hasQuickFacts && (
-        <div className="mb-8">
-          <h2 className="text-xl font-bold text-[var(--color-foreground)] mb-4">
-            {t("countries.quick_facts")}
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {/* System of Government */}
-            {country.systemOfGovernment && (
-              <Card>
-                <CardContent className="p-4">
-                  <p className="text-xs text-[var(--color-muted-foreground)] mb-1">{t("countries.system_of_government")}</p>
-                  <p className="text-sm font-semibold text-[var(--color-foreground)]">{country.systemOfGovernment}</p>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* HDI */}
-            {country.hdi != null && (
-              <Card>
-                <CardContent className="p-4">
-                  <p className="text-xs text-[var(--color-muted-foreground)] mb-1 flex items-center">
-                    {t("countries.hdi")}
-                    <Tooltip text={t("countries.hdi_tooltip")} />
-                  </p>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-lg font-bold text-[var(--color-foreground)]">{country.hdi.toFixed(3)}</span>
-                    <HdiLabel value={country.hdi} t={t} />
+        <Card className="mb-8">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg">{t("countries.quick_facts")}</CardTitle>
+          </CardHeader>
+          <CardContent className="px-6 pb-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-[var(--color-border)]">
+              {/* Left column — key-value rows */}
+              <div className="divide-y divide-[var(--color-border)] md:pe-6">
+                {country.systemOfGovernment && (
+                  <div className="flex items-center justify-between py-2.5">
+                    <span className="text-sm text-[var(--color-muted-foreground)]">{t("countries.system_of_government")}</span>
+                    <span className="text-sm font-medium text-[var(--color-foreground)]">{country.systemOfGovernment}</span>
                   </div>
-                  <ProgressBar value={country.hdi} max={1} colorClass={hdiColor(country.hdi)} />
-                </CardContent>
-              </Card>
-            )}
+                )}
 
-            {/* Corruption Index */}
-            {country.corruptionIndex != null && (
-              <Card>
-                <CardContent className="p-4">
-                  <p className="text-xs text-[var(--color-muted-foreground)] mb-1 flex items-center">
-                    {t("countries.corruption_index")}
-                    <Tooltip text={t("countries.corruption_index_tooltip")} />
-                  </p>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-lg font-bold text-[var(--color-foreground)]">{country.corruptionIndex}/100</span>
-                    <CorruptionLabel value={country.corruptionIndex} t={t} />
+                {country.independenceDate && (
+                  <div className="flex items-center justify-between py-2.5">
+                    <span className="text-sm text-[var(--color-muted-foreground)]">{t("countries.independence_date")}</span>
+                    <span className="text-sm font-medium text-[var(--color-foreground)]">{formatDate(country.independenceDate, locale)}</span>
                   </div>
-                  <ProgressBar value={country.corruptionIndex} max={100} colorClass={cpiColor(country.corruptionIndex)} />
-                </CardContent>
-              </Card>
-            )}
+                )}
 
-            {/* GDP */}
-            {country.gdp && (
-              <Card>
-                <CardContent className="p-4">
-                  <p className="text-xs text-[var(--color-muted-foreground)] mb-1">{t("countries.gdp")}</p>
-                  <p className="text-sm font-semibold text-[var(--color-foreground)]">{country.gdp}</p>
-                  {country.economicType && (
-                    <span className="mt-1 inline-block rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-700">
-                      {country.economicType}
-                    </span>
-                  )}
-                </CardContent>
-              </Card>
-            )}
+                {country.gdp && (
+                  <div className="flex items-center justify-between py-2.5">
+                    <span className="text-sm text-[var(--color-muted-foreground)]">{t("countries.gdp")}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-[var(--color-foreground)]">{country.gdp}</span>
+                      {country.economicType && (
+                        <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[11px] font-medium text-blue-700 leading-none">
+                          {country.economicType}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
 
-            {/* Independence Date */}
-            {country.independenceDate && (
-              <Card>
-                <CardContent className="p-4">
-                  <p className="text-xs text-[var(--color-muted-foreground)] mb-1">{t("countries.independence_date")}</p>
-                  <p className="text-sm font-semibold text-[var(--color-foreground)]">
-                    {formatDate(country.independenceDate, locale)}
-                  </p>
-                </CardContent>
-              </Card>
-            )}
+                {country.officialLanguages && country.officialLanguages.length > 0 && (
+                  <div className="flex items-center justify-between py-2.5">
+                    <span className="text-sm text-[var(--color-muted-foreground)]">{t("countries.official_languages")}</span>
+                    <div className="flex flex-wrap gap-1 justify-end">
+                      {country.officialLanguages.map((lang) => (
+                        <span key={lang} className="rounded-full bg-[var(--color-muted)] px-2 py-0.5 text-xs font-medium text-[var(--color-foreground)]">
+                          {lang}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
-            {/* Official Languages */}
-            {country.officialLanguages && country.officialLanguages.length > 0 && (
-              <Card>
-                <CardContent className="p-4">
-                  <p className="text-xs text-[var(--color-muted-foreground)] mb-1">{t("countries.official_languages")}</p>
-                  <div className="flex flex-wrap gap-1.5 mt-1">
-                    {country.officialLanguages.map((lang) => (
-                      <span key={lang} className="inline-block rounded-full bg-[var(--color-muted)] px-2.5 py-0.5 text-xs font-medium text-[var(--color-foreground)]">
-                        {lang}
+                {/* Religious Composition — inline beneath key-value rows */}
+                {country.religiousComposition && country.religiousComposition.length > 0 && (
+                  <div className="py-2.5">
+                    <span className="text-sm text-[var(--color-muted-foreground)]">{t("countries.religious_composition")}</span>
+                    <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1.5">
+                      {country.religiousComposition.map((item: ReligiousComposition) => (
+                        <span key={item.religion} className="text-xs text-[var(--color-foreground)]">
+                          {item.religion} <span className="text-[var(--color-muted-foreground)] font-medium">{item.percentage}%</span>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Right column — metrics with progress bars */}
+              <div className="space-y-4 pt-4 md:pt-0 md:ps-6">
+                {country.hdi != null && (
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm text-[var(--color-muted-foreground)] flex items-center">
+                        {t("countries.hdi")}
+                        <Tooltip text={t("countries.hdi_tooltip")} />
                       </span>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Urbanization Rate */}
-            {country.urbanizationRate != null && (
-              <Card>
-                <CardContent className="p-4">
-                  <p className="text-xs text-[var(--color-muted-foreground)] mb-1">{t("countries.urbanization_rate")}</p>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-lg font-bold text-[var(--color-foreground)]">{country.urbanizationRate}%</span>
-                  </div>
-                  <ProgressBar value={country.urbanizationRate} max={100} colorClass="bg-violet-500" />
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Religious Composition */}
-            {country.religiousComposition && country.religiousComposition.length > 0 && (
-              <Card className="sm:col-span-2 lg:col-span-1">
-                <CardContent className="p-4">
-                  <p className="text-xs text-[var(--color-muted-foreground)] mb-2">{t("countries.religious_composition")}</p>
-                  <div className="space-y-2">
-                    {country.religiousComposition.map((item: ReligiousComposition) => (
-                      <div key={item.religion} className="flex items-center justify-between text-sm">
-                        <span className="text-[var(--color-foreground)]">{item.religion}</span>
-                        <span className="text-[var(--color-muted-foreground)] font-medium">{item.percentage}%</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-semibold text-[var(--color-foreground)]">{country.hdi.toFixed(3)}</span>
+                        <HdiLabel value={country.hdi} t={t} />
                       </div>
-                    ))}
+                    </div>
+                    <ProgressBar value={country.hdi} max={1} colorClass={hdiColor(country.hdi)} />
                   </div>
-                </CardContent>
-              </Card>
-            )}
-          </div>
-        </div>
+                )}
+
+                {country.corruptionIndex != null && (
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm text-[var(--color-muted-foreground)] flex items-center">
+                        {t("countries.corruption_index")}
+                        <Tooltip text={t("countries.corruption_index_tooltip")} />
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-semibold text-[var(--color-foreground)]">{country.corruptionIndex}/100</span>
+                        <CorruptionLabel value={country.corruptionIndex} t={t} />
+                      </div>
+                    </div>
+                    <ProgressBar value={country.corruptionIndex} max={100} colorClass={cpiColor(country.corruptionIndex)} />
+                  </div>
+                )}
+
+                {country.urbanizationRate != null && (
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm text-[var(--color-muted-foreground)]">{t("countries.urbanization_rate")}</span>
+                      <span className="text-sm font-semibold text-[var(--color-foreground)]">{country.urbanizationRate}%</span>
+                    </div>
+                    <ProgressBar value={country.urbanizationRate} max={100} colorClass="bg-violet-500" />
+                  </div>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
