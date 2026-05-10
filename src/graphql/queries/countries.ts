@@ -49,8 +49,8 @@ export const GET_COUNTRY = gql`
       borders
       naturalResources
       authors {
-        name
-        bio
+        name { fa en }
+        bio { fa en }
         imageUrl
       }
       amendments {

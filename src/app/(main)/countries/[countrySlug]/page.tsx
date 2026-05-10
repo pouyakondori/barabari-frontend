@@ -322,11 +322,11 @@ export default function CountryProfilePage() {
                   {country.authors.map((author, i) => (
                     <div key={i} className="flex items-start gap-3">
                       <div className="h-10 w-10 rounded-full bg-[var(--color-primary)] flex items-center justify-center text-white font-bold">
-                        {author.name.charAt(0)}
+                        {localized(author.name, locale).charAt(0)}
                       </div>
                       <div>
-                        <p className="font-medium text-[var(--color-foreground)]">{author.name}</p>
-                        <p className="text-sm text-[var(--color-muted-foreground)]">{author.bio}</p>
+                        <p className="font-medium text-[var(--color-foreground)]">{localized(author.name, locale)}</p>
+                        <p className="text-sm text-[var(--color-muted-foreground)]">{localized(author.bio, locale)}</p>
                       </div>
                     </div>
                   ))}

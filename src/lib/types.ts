@@ -10,8 +10,8 @@ export interface Coordinates {
 }
 
 export interface Author {
-  name: string;
-  bio: string;
+  name: LocalizedString;
+  bio: LocalizedString;
   imageUrl?: string;
 }
 
