@@ -3,6 +3,7 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { Play, Pause, Download, Volume2, VolumeX } from "lucide-react";
 import { useTranslation } from "@/locale";
+import { localizeNumber } from "@/lib/utils";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_REST_URL || "http://localhost:4001";
 
@@ -13,15 +14,15 @@ interface PodcastPlayerProps {
   duration?: number;
 }
 
-function formatTime(seconds: number): string {
-  if (!seconds || isNaN(seconds)) return "0:00";
+function formatTime(seconds: number, locale: string): string {
+  if (!seconds || isNaN(seconds)) return localizeNumber("0:00", locale);
   const m = Math.floor(seconds / 60);
   const s = Math.floor(seconds % 60);
-  return `${m}:${s.toString().padStart(2, "0")}`;
+  return localizeNumber(`${m}:${s.toString().padStart(2, "0")}`, locale);
 }
 
 export default function PodcastPlayer({ audioUrl, title, description, duration }: PodcastPlayerProps) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const audioRef = useRef<HTMLAudioElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -113,7 +114,7 @@ export default function PodcastPlayer({ audioUrl, title, description, duration }
 
         <div className="flex-1 flex items-center gap-2">
           <span className="text-xs text-[var(--color-muted-foreground)] tabular-nums w-10 text-end">
-            {formatTime(currentTime)}
+            {formatTime(currentTime, locale)}
           </span>
           <div
             ref={progressRef}
@@ -130,7 +131,7 @@ export default function PodcastPlayer({ audioUrl, title, description, duration }
             />
           </div>
           <span className="text-xs text-[var(--color-muted-foreground)] tabular-nums w-10">
-            {formatTime(totalDuration)}
+            {formatTime(totalDuration, locale)}
           </span>
         </div>
 

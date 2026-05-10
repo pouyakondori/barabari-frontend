@@ -6,7 +6,7 @@ import { GET_TOPIC } from "@/graphql/queries/topics";
 import { GET_COUNTRIES } from "@/graphql/queries/countries";
 import { GET_CONSTITUTION } from "@/graphql/queries/constitution";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { localized } from "@/lib/utils";
+import { localized, localizeNumber } from "@/lib/utils";
 import { useTranslation } from "@/locale";
 import Link from "next/link";
 import { ArrowRight, ThumbsUp, ThumbsDown } from "lucide-react";
@@ -118,8 +118,8 @@ function CountryClauseList({ country, topicSlug }: { country: Country; topicSlug
                     {localized(clause.text, locale)}
                   </Link>
                 </td>
-                <td className="py-3 text-center text-green-600 font-medium">{clause.agreeCount}</td>
-                <td className="py-3 text-center text-red-600 font-medium">{clause.disagreeCount}</td>
+                <td className="py-3 text-center text-green-600 font-medium">{localizeNumber(clause.agreeCount, locale)}</td>
+                <td className="py-3 text-center text-red-600 font-medium">{localizeNumber(clause.disagreeCount, locale)}</td>
               </tr>
             ))}
           </tbody>

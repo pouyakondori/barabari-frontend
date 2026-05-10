@@ -9,7 +9,7 @@ import { GET_PODCASTS_BY_COUNTRY } from "@/graphql/queries/podcasts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { TimelineStepper } from "@/components/timeline/TimelineStepper";
-import { localized, formatNumber, formatDate } from "@/lib/utils";
+import { localized, formatNumber, formatDate, localizeNumber } from "@/lib/utils";
 import { useTranslation } from "@/locale";
 import Link from "next/link";
 import { BookOpen, Clock, Users, Info } from "lucide-react";
@@ -63,6 +63,12 @@ function Tooltip({ text }: { text: string }) {
       </span>
     </span>
   );
+}
+
+function translateEnum(t: (key: string) => string, prefix: string, value: string): string {
+  const key = `countries.${prefix}.${value}`;
+  const translated = t(key);
+  return translated !== key ? translated : value;
 }
 
 export default function CountryProfilePage() {
@@ -171,9 +177,7 @@ export default function CountryProfilePage() {
                   <div className="flex items-center justify-between py-2.5">
                     <span className="text-sm text-[var(--color-muted-foreground)]">{t("countries.system_of_government")}</span>
                     <span className="text-sm font-medium text-[var(--color-foreground)]">
-                      {t(`countries.government_types.${country.systemOfGovernment}`) !== `countries.government_types.${country.systemOfGovernment}`
-                        ? t(`countries.government_types.${country.systemOfGovernment}`)
-                        : country.systemOfGovernment}
+                      {translateEnum(t, "government_types", country.systemOfGovernment)}
                     </span>
                   </div>
                 )}
@@ -189,10 +193,10 @@ export default function CountryProfilePage() {
                   <div className="flex items-center justify-between py-2.5">
                     <span className="text-sm text-[var(--color-muted-foreground)]">{t("countries.gdp")}</span>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-[var(--color-foreground)]">{country.gdp}</span>
+                      <span className="text-sm font-medium text-[var(--color-foreground)]">{localizeNumber(country.gdp, locale)}</span>
                       {country.economicType && (
                         <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[11px] font-medium text-blue-700 leading-none">
-                          {country.economicType}
+                          {translateEnum(t, "economic_types", country.economicType)}
                         </span>
                       )}
                     </div>
@@ -205,7 +209,7 @@ export default function CountryProfilePage() {
                     <div className="flex flex-wrap gap-1 justify-end">
                       {country.officialLanguages.map((lang) => (
                         <span key={lang} className="rounded-full bg-[var(--color-muted)] px-2 py-0.5 text-xs font-medium text-[var(--color-foreground)]">
-                          {lang}
+                          {translateEnum(t, "languages", lang)}
                         </span>
                       ))}
                     </div>
@@ -219,7 +223,7 @@ export default function CountryProfilePage() {
                     <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1.5">
                       {country.religiousComposition.map((item: ReligiousComposition) => (
                         <span key={item.religion} className="text-xs text-[var(--color-foreground)]">
-                          {item.religion} <span className="text-[var(--color-muted-foreground)] font-medium">{item.percentage}%</span>
+                          {translateEnum(t, "religions", item.religion)} <span className="text-[var(--color-muted-foreground)] font-medium">{localizeNumber(item.percentage, locale)}%</span>
                         </span>
                       ))}
                     </div>
@@ -237,7 +241,7 @@ export default function CountryProfilePage() {
                         <Tooltip text={t("countries.hdi_tooltip")} />
                       </span>
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-semibold text-[var(--color-foreground)]">{country.hdi.toFixed(3)}</span>
+                        <span className="text-sm font-semibold text-[var(--color-foreground)]">{localizeNumber(country.hdi.toFixed(3), locale)}</span>
                         <HdiLabel value={country.hdi} t={t} />
                       </div>
                     </div>
@@ -253,7 +257,7 @@ export default function CountryProfilePage() {
                         <Tooltip text={t("countries.corruption_index_tooltip")} />
                       </span>
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-semibold text-[var(--color-foreground)]">{country.corruptionIndex}/100</span>
+                        <span className="text-sm font-semibold text-[var(--color-foreground)]">{localizeNumber(country.corruptionIndex, locale)}/{localizeNumber(100, locale)}</span>
                         <CorruptionLabel value={country.corruptionIndex} t={t} />
                       </div>
                     </div>
@@ -265,7 +269,7 @@ export default function CountryProfilePage() {
                   <div>
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-sm text-[var(--color-muted-foreground)]">{t("countries.urbanization_rate")}</span>
-                      <span className="text-sm font-semibold text-[var(--color-foreground)]">{country.urbanizationRate}%</span>
+                      <span className="text-sm font-semibold text-[var(--color-foreground)]">{localizeNumber(country.urbanizationRate, locale)}%</span>
                     </div>
                     <ProgressBar value={country.urbanizationRate} max={100} colorClass="bg-violet-500" />
                   </div>

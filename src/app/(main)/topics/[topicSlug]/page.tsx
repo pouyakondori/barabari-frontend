@@ -7,7 +7,7 @@ import { GET_CONSTITUTION } from "@/graphql/queries/constitution";
 import { GET_COUNTRIES } from "@/graphql/queries/countries";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { localized } from "@/lib/utils";
+import { localized, localizeNumber } from "@/lib/utils";
 import { useTranslation } from "@/locale";
 import Link from "next/link";
 import { ArrowRight, ThumbsUp, ThumbsDown } from "lucide-react";
@@ -118,8 +118,8 @@ function CountryTopicCard({ country, topicSlug }: { country: Country; topicSlug:
                   {localized(clause.text, locale)}
                 </p>
                 <div className="flex items-center gap-3 mt-2 text-xs text-[var(--color-muted-foreground)]">
-                  <span><ThumbsUp className="inline h-3.5 w-3.5 me-1" />{clause.agreeCount}</span>
-                  <span><ThumbsDown className="inline h-3.5 w-3.5 me-1" />{clause.disagreeCount}</span>
+                  <span><ThumbsUp className="inline h-3.5 w-3.5 me-1" />{localizeNumber(clause.agreeCount, locale)}</span>
+                  <span><ThumbsDown className="inline h-3.5 w-3.5 me-1" />{localizeNumber(clause.disagreeCount, locale)}</span>
                 </div>
               </Link>
             ))}

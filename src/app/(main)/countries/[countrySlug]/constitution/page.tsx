@@ -5,7 +5,7 @@ import { useQuery } from "@apollo/client/react";
 import { GET_COUNTRY } from "@/graphql/queries/countries";
 import { GET_CONSTITUTION } from "@/graphql/queries/constitution";
 import { Card, CardContent } from "@/components/ui/card";
-import { localized } from "@/lib/utils";
+import { localized, localizeNumber } from "@/lib/utils";
 import { useTranslation } from "@/locale";
 import Link from "next/link";
 import { ArrowRight, BookOpen, ThumbsUp, ThumbsDown } from "lucide-react";
@@ -97,8 +97,8 @@ export default function ConstitutionPage() {
                                     </p>
                                   </div>
                                   <div className="flex items-center gap-3 mt-1 text-xs text-[var(--color-muted-foreground)]">
-                                    <span><ThumbsUp className="inline h-3.5 w-3.5 me-1" />{clause.agreeCount}</span>
-                                    <span><ThumbsDown className="inline h-3.5 w-3.5 me-1" />{clause.disagreeCount}</span>
+                                    <span><ThumbsUp className="inline h-3.5 w-3.5 me-1" />{localizeNumber(clause.agreeCount, locale)}</span>
+                                    <span><ThumbsDown className="inline h-3.5 w-3.5 me-1" />{localizeNumber(clause.disagreeCount, locale)}</span>
                                   </div>
                                 </Link>
                               ))}

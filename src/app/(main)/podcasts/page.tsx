@@ -4,14 +4,16 @@ import { useQuery } from "@apollo/client/react";
 import { Headphones, Calendar, Clock, Globe } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useTranslation } from "@/locale";
+import { localizeNumber } from "@/lib/utils";
 import { GET_PODCASTS } from "@/graphql/queries/podcasts";
 import type { Podcast } from "@/lib/types";
 import PodcastPlayer from "@/components/podcast/PodcastPlayer";
 
-function formatDuration(seconds: number): string {
+function formatDuration(seconds: number, locale: string): string {
   const m = Math.floor(seconds / 60);
   const s = seconds % 60;
-  return `${m}:${s.toString().padStart(2, "0")}`;
+  const str = `${m}:${s.toString().padStart(2, "0")}`;
+  return localizeNumber(str, locale);
 }
 
 export default function PodcastsPage() {
@@ -70,7 +72,7 @@ export default function PodcastsPage() {
                   {podcast.duration > 0 && (
                     <span className="flex items-center gap-1">
                       <Clock className="h-3.5 w-3.5" />
-                      {formatDuration(podcast.duration)}
+                      {formatDuration(podcast.duration, locale)}
                     </span>
                   )}
                   {podcast.publishedAt && (
