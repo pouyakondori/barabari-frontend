@@ -39,8 +39,6 @@ export interface Country {
   naturalResources?: string[];
   authors: Author[];
   amendments: Amendment[];
-  podcastUrl?: string;
-  videoUrl?: string;
   countryCode: string;
   systemOfGovernment?: string;
   hdi?: number;

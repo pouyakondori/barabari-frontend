@@ -60,8 +60,6 @@ export const GET_COUNTRY = gql`
           en
         }
       }
-      podcastUrl
-      videoUrl
       countryCode
       systemOfGovernment
       hdi
