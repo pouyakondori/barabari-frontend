@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { localized } from "@/lib/utils";
 import { useTranslation } from "@/locale";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ThumbsUp, ThumbsDown } from "lucide-react";
 import type { Topic, Country, Clause, Constitution } from "@/lib/types";
 
 export default function ComparisonTablePage() {
@@ -100,8 +100,8 @@ function CountryClauseList({ country, topicSlug }: { country: Country; topicSlug
             <tr className="border-b border-[var(--color-border)]">
               <th className="pb-2 text-start font-medium text-[var(--color-muted-foreground)]">{t("tables.header_clause")}</th>
               <th className="pb-2 text-start font-medium text-[var(--color-muted-foreground)]">{t("tables.header_text")}</th>
-              <th className="pb-2 text-center font-medium text-[var(--color-muted-foreground)]">👍</th>
-              <th className="pb-2 text-center font-medium text-[var(--color-muted-foreground)]">👎</th>
+              <th className="pb-2 text-center font-medium text-[var(--color-muted-foreground)]"><ThumbsUp className="inline h-4 w-4" /></th>
+              <th className="pb-2 text-center font-medium text-[var(--color-muted-foreground)]"><ThumbsDown className="inline h-4 w-4" /></th>
             </tr>
           </thead>
           <tbody>

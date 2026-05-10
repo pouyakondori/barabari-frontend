@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { localized } from "@/lib/utils";
 import { useTranslation } from "@/locale";
 import Link from "next/link";
-import { ArrowRight, BookOpen } from "lucide-react";
+import { ArrowRight, BookOpen, ThumbsUp, ThumbsDown } from "lucide-react";
 import type { Country, Constitution, Chapter, Article, Clause } from "@/lib/types";
 
 export default function ConstitutionPage() {
@@ -97,8 +97,8 @@ export default function ConstitutionPage() {
                                     </p>
                                   </div>
                                   <div className="flex items-center gap-3 mt-1 text-xs text-[var(--color-muted-foreground)]">
-                                    <span>👍 {clause.agreeCount}</span>
-                                    <span>👎 {clause.disagreeCount}</span>
+                                    <span><ThumbsUp className="inline h-3.5 w-3.5 me-1" />{clause.agreeCount}</span>
+                                    <span><ThumbsDown className="inline h-3.5 w-3.5 me-1" />{clause.disagreeCount}</span>
                                   </div>
                                 </Link>
                               ))}
