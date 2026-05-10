@@ -130,6 +130,24 @@ export interface TimelineEvent {
   order: number;
 }
 
+export interface Podcast {
+  id: string;
+  title: LocalizedString;
+  description: LocalizedString;
+  audioUrl: string;
+  coverImage?: string;
+  country?: {
+    id: string;
+    name: LocalizedString;
+  };
+  topic?: {
+    id: string;
+    name: LocalizedString;
+  };
+  duration: number;
+  publishedAt: string;
+}
+
 export interface PlatformStats {
   totalCountries: number;
   totalClauses: number;

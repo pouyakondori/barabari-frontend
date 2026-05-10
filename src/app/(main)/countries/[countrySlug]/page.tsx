@@ -5,6 +5,7 @@ import { useQuery } from "@apollo/client/react";
 import { GET_COUNTRY } from "@/graphql/queries/countries";
 import { GET_CONSTITUTION } from "@/graphql/queries/constitution";
 import { GET_COUNTRY_TIMELINE } from "@/graphql/queries/timeline";
+import { GET_PODCASTS_BY_COUNTRY } from "@/graphql/queries/podcasts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { TimelineStepper } from "@/components/timeline/TimelineStepper";
@@ -13,7 +14,8 @@ import { useTranslation } from "@/locale";
 import Link from "next/link";
 import { BookOpen, Clock, Users, Info } from "lucide-react";
 import { GeographicCard } from "@/components/country/GeographicCard";
-import type { Country, Constitution, TimelineEvent, Amendment, ReligiousComposition } from "@/lib/types";
+import PodcastPlayer from "@/components/podcast/PodcastPlayer";
+import type { Country, Constitution, TimelineEvent, Amendment, ReligiousComposition, Podcast } from "@/lib/types";
 
 function HdiLabel({ value, t }: { value: number; t: (key: string) => string }) {
   if (value >= 0.8) return <span className="text-emerald-600 font-medium">{t("countries.very_high")}</span>;
@@ -77,10 +79,14 @@ export default function CountryProfilePage() {
   const { data: timelineData } = useQuery<{ countryTimeline: TimelineEvent[] }>(GET_COUNTRY_TIMELINE, {
     variables: { countrySlug },
   });
+  const { data: podcastData } = useQuery<{ podcastsByCountry: Podcast[] }>(GET_PODCASTS_BY_COUNTRY, {
+    variables: { countrySlug },
+  });
 
   const country = countryData?.country;
   const constitution = constitutionData?.constitution;
   const timeline = timelineData?.countryTimeline || [];
+  const podcasts = podcastData?.podcastsByCountry || [];
 
   if (countryLoading) {
     return (
@@ -343,6 +349,26 @@ export default function CountryProfilePage() {
                     </div>
                   ))}
                 </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Podcasts */}
+          {podcasts.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>{t("podcasts.country_podcasts")}</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {podcasts.map((podcast) => (
+                  <PodcastPlayer
+                    key={podcast.id}
+                    audioUrl={podcast.audioUrl}
+                    title={localized(podcast.title, locale)}
+                    description={localized(podcast.description, locale)}
+                    duration={podcast.duration}
+                  />
+                ))}
               </CardContent>
             </Card>
           )}

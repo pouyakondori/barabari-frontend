@@ -137,7 +137,16 @@
     "title": "Podcasts",
     "description": "Analytical podcasts about constitutions of different countries",
     "coming_soon": "Coming Soon",
-    "coming_soon_desc": "Barabari analytical podcasts will be published soon."
+    "coming_soon_desc": "Barabari analytical podcasts will be published soon.",
+    "no_podcasts": "No Podcasts Yet",
+    "no_podcasts_desc": "Podcasts will be added soon. Stay tuned!",
+    "country_podcasts": "Podcasts",
+    "play": "Play",
+    "pause": "Pause",
+    "mute": "Mute",
+    "unmute": "Unmute",
+    "download": "Download",
+    "listen_now": "Listen Now"
   },
   "sandbox": {
     "title": "Constitution Sandbox",
