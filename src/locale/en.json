@@ -212,7 +212,9 @@
     "description": "Legal and civic topics in world constitutions",
     "not_found": "Topic not found",
     "back_to_topics": "Back to Topics",
-    "no_clauses": "No clauses found for this topic"
+    "no_clauses": "No clauses found for this topic",
+    "most_popular": "Most Popular Clauses",
+    "most_unpopular": "Most Unpopular Clauses"
   },
   "tables": {
     "title": "Comparison Tables",
