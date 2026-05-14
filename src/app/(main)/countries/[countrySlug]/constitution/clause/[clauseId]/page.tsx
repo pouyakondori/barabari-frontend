@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import { useQuery } from "@apollo/client/react";
 import { GET_CLAUSE } from "@/graphql/queries/constitution";
 import { GET_COUNTRY } from "@/graphql/queries/countries";
+import { GET_TOPICS } from "@/graphql/queries/topics";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { VoteButtons } from "@/components/votes/VoteButtons";
@@ -12,7 +13,7 @@ import { localized, localizeNumber } from "@/lib/utils";
 import { useTranslation } from "@/locale";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import type { Clause, Country } from "@/lib/types";
+import type { Clause, Country, Topic } from "@/lib/types";
 
 export default function ClauseDetailPage() {
   const params = useParams();
@@ -26,9 +27,13 @@ export default function ClauseDetailPage() {
   const { data: countryData } = useQuery<{ country: Country }>(GET_COUNTRY, {
     variables: { slug: countrySlug },
   });
+  const { data: topicsData } = useQuery<{ topics: { items: Topic[] } }>(GET_TOPICS);
 
   const clause = clauseData?.clause;
   const country = countryData?.country;
+  const topicsBySlug = new Map(
+    (topicsData?.topics?.items || []).map((t) => [t.slug, t])
+  );
 
   if (clauseLoading) {
     return (
@@ -65,7 +70,7 @@ export default function ClauseDetailPage() {
               {clause.topicSlugs.map((slug: string) => (
                 <Link key={slug} href={`/topics/${slug}`}>
                   <Badge variant="outline" className="cursor-pointer hover:bg-[var(--color-muted)]">
-                    {slug}
+                    {topicsBySlug.get(slug) ? localized(topicsBySlug.get(slug)!.name, locale) : slug}
                   </Badge>
                 </Link>
               ))}
