@@ -2,19 +2,22 @@ import { gql } from "@apollo/client";
 
 export const GET_TOPICS = gql`
   query GetTopics {
-    topics {
-      id
-      slug
-      name {
-        fa
-        en
+    topics(limit: 100) {
+      items {
+        id
+        slug
+        name {
+          fa
+          en
+        }
+        category
+        description {
+          fa
+          en
+        }
+        order
       }
-      category
-      description {
-        fa
-        en
-      }
-      order
+      total
     }
   }
 `;

@@ -11,8 +11,8 @@ import type { Topic } from "@/lib/types";
 
 export default function TablesPage() {
   const { t, locale } = useTranslation();
-  const { data, loading } = useQuery<{ topics: Topic[] }>(GET_TOPICS);
-  const topics = data?.topics || [];
+  const { data, loading } = useQuery<{ topics: { items: Topic[] } }>(GET_TOPICS);
+  const topics = data?.topics?.items || [];
 
   // Group by category
   const grouped = TOPIC_CATEGORIES.map((cat) => ({

@@ -18,11 +18,11 @@ export default function HomePage() {
   const { t, locale } = useTranslation();
   const { data: countriesData, loading: countriesLoading } = useQuery<{ featuredCountries: Country[] }>(GET_FEATURED_COUNTRIES);
   const { data: statsData } = useQuery<{ platformStats: PlatformStats }>(GET_PLATFORM_STATS);
-  const { data: topicsData } = useQuery<{ topics: Topic[] }>(GET_TOPICS);
+  const { data: topicsData } = useQuery<{ topics: { items: Topic[] } }>(GET_TOPICS);
 
   const countries = countriesData?.featuredCountries || [];
   const stats = statsData?.platformStats;
-  const topics = topicsData?.topics || [];
+  const topics = topicsData?.topics?.items || [];
 
   return (
     <div>

@@ -311,11 +311,11 @@
     "back": "Back"
   },
   "categories": {
-    "fundamental-rights": "Fundamental Rights",
-    "power-distribution": "Power & Distribution",
-    "rights-justice": "Rights & Justice",
-    "social-economic": "Social & Economic",
+    "fundamental-rights": "Basic Rights / Fundamental Rights",
+    "power-distribution": "Power and Its Distribution",
+    "rights-justice": "Law and Justice",
+    "social-economic": "Social and Economic Rights",
     "civic-duties": "Civic Duties",
-    "constitutional-revision": "Constitutional Revision"
+    "constitutional-revision": "Constitutional Review"
   }
 }

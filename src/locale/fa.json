@@ -311,10 +311,10 @@
     "back": "بازگشت"
   },
   "categories": {
-    "fundamental-rights": "حقوق بنیادین",
-    "power-distribution": "قدرت و توزیع",
+    "fundamental-rights": "حقوق اولیه",
+    "power-distribution": "قدرت و توزیع آن",
     "rights-justice": "حقوق و عدالت",
-    "social-economic": "اجتماعی-اقتصادی",
+    "social-economic": "حقوق اجتماعی و اقتصادی",
     "civic-duties": "وظایف مدنی",
     "constitutional-revision": "بازنگری قانون اساسی"
   }
