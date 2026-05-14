@@ -53,7 +53,7 @@ export default function TopicPage() {
       </Link>
 
       <div className="mb-8">
-        <Badge variant="outline" className="mb-2">{topic.category}</Badge>
+        <Badge variant="outline" className="mb-2">{t(`categories.${topic.category}`)}</Badge>
         <h1 className="text-3xl font-bold text-[var(--color-foreground)]">
           {localized(topic.name, locale)}
         </h1>
